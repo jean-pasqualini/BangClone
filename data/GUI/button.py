@@ -174,7 +174,7 @@ if __name__ == '__main__':
             print('button 1 pressed')
             
         def test2(self, arg):
-            print('button 2 pressed with arg {}'.format(arg))
+            print(f"button 2 pressed with arg {arg}")
                     
         def update(self):
             pass
