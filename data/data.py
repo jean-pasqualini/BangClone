@@ -1,3 +1,5 @@
+'''temporary database: table for cards'''
+
 data = {
 #roles
     'fbi':{

@@ -25,6 +25,7 @@ def get_category(path):
     return os.path.split(os.path.split(path)[0])[1]
     
 def get_filename(path):
+    '''get filename from image fullpath of card'''
     return os.path.split(os.path.splitext(path)[0])[1]
 
 
@@ -110,10 +111,6 @@ def render_textrect(string, font, rect, text_color, background_color, justificat
         accumulated_height += font.size(line)[1]
 
     return surface
-    
-    
-    
-    
                     
 class Image:
     path = 'resources/graphics'
@@ -154,6 +151,7 @@ class Music:
         pg.mixer.music.load(self.tracks[0])
 
 class States:
+    '''TODO'''
     def __init__(self):        
         self.bogus_rect = pg.Surface([0,0]).get_rect()
         self.screen_rect = self.bogus_rect
@@ -163,7 +161,7 @@ class States:
         self.button_sound.sound.set_volume(self.button_volume)
         self.button_hover = Sound('button_hover.wav')
         self.button_hover.sound.set_volume(self.button_hover_volume)
-        self.background_music_volume = .3
+        self.background_music_volume = .1
         self.background_music = Music(self.background_music_volume)
         self.bg_color = (25,25,25)
         self.timer = 0.0
@@ -220,8 +218,9 @@ class States:
         return text,rect
         
     def pre_render_options(self):
+        '''handle selected and deselected menu options render '''
         font_deselect = Font.load('impact.ttf', 25)
-        font_selected = Font.load('impact.ttf', 40)
+        font_selected = Font.load('impact.ttf', 35)
 
         rendered_msg = {"des":[],"sel":[]}
         for option in self.options:

@@ -50,7 +50,7 @@ class Game(tools.States):
             "hover_font_color"   : (0,0,0),
             'font'               : tools.Font.load('impact.ttf', 24),
             'font_color'         : (0,0,0),
-            'call_on_release'    : False
+            'call_on_release'    : True
         }
         self.play_card_button = button.Button((25,50,175,50),(100,200,100), 
             self.hand_to_table, text='Play Card', **button_config
@@ -104,6 +104,8 @@ class Game(tools.States):
                 else: #select new card, and deselect current card
                     self.set_all_cards_select_to_false()
                     card.selected = True
+                self.button_sound.sound.play()
+
                     
     def set_all_cards_select_to_false(self):
         for card in self.hand:
@@ -206,6 +208,6 @@ class Game(tools.States):
     def entry(self):
         if not self.is_hand_set:
             self.is_hand_set = True
-            self.hand = self.set_hand(4)
+            self.hand = self.set_hand(6)
         pass#pg.mixer.music.pause()
         #pg.mixer.music.play()
