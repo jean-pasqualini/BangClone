@@ -191,7 +191,11 @@ class Game(tools.States):
 
     def render(self, screen):
         screen.blit(self.bg, self.bg_rect)
-        
+        self.render_hand(screen)
+        if self.help_overlay:
+            self.render_overlay(screen)
+
+    def render_hand(self, screen):
         c = None
         for card in self.hand:
             if card.selected:
@@ -206,15 +210,13 @@ class Game(tools.States):
             self.play_card_button.render(screen)
             screen.blit(self.help_btn_image, self.help_btn_image_rect)
 
-        if self.help_overlay:
-            screen.blit(self.overlay_bg,(0,0))
-            screen.blit(self.help_overlay_title, self.help_overlay_title_rect)
-            screen.blit(self.help_overlay_text, self.help_overlay_text_rect)
-            sel = self.selected_card()
-            screen.blit(sel.surf, self.overlay_card_position)
+    def render_overlay(self, screen):
+        screen.blit(self.overlay_bg,(0,0))
+        screen.blit(self.help_overlay_title, self.help_overlay_title_rect)
+        screen.blit(self.help_overlay_text, self.help_overlay_text_rect)
+        sel = self.selected_card()
+        screen.blit(sel.surf, self.overlay_card_position)
             
-        #screen.blit(self.settings, self.settings_rect)
-        
 
     def update_hand_position(self):
         for i, card in enumerate(self.hand):
