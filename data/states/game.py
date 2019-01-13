@@ -21,14 +21,17 @@ class Game(tools.States):
         self.overlay_bg.fill(0)
         self.overlay_bg.set_alpha(200)
         self.overlay_card_position = (100,200)
-        
+        self.database = data.data
+
         self.deck = []
         self.full_deck = []
-        self.database = data.data
+        self.discard = []
         self.create_full_deck()
-        self.get_hand_cards()
+        self.fill_deck()
 
-        #self.make_deck()
+        self.table = []
+        self.discard = []
+
         self.bg_color = (255,255,255)
         self.help_overlay = False
         self.card_bufferX = 100
@@ -56,11 +59,11 @@ class Game(tools.States):
             'call_on_release'    : True
         }
         self.play_card_button = button.Button((25,50,175,50),(100,200,100), 
-            self.hand_to_table, text='Play Card', **button_config
+            self.card_to_table, text='Play Card', **button_config
         )
-        self.table = []
         
-    def hand_to_table(self):
+        
+    def card_to_table(self):
         card = self.selected_card()
         self.hand.remove(card)
         self.table.append(card)
@@ -68,6 +71,10 @@ class Game(tools.States):
         print(f'cards in deck :{len(self.deck)}')
         print(f'cards in hand :{len(self.hand)}')
 
+
+    def card_to_discard(self, card):
+        self.table.remove(card)
+        self.discard.append(card)
     
     def get_event(self, event, keys):
         if self.selected_card():
@@ -158,6 +165,12 @@ class Game(tools.States):
     def update(self, now, keys):
         if not self.help_overlay:
             self.update_hand_position()
+            # TEMPORARY
+            if not self.hand and len(self.deck) >= 1:
+                if len(self.deck) < 4:
+                    self.hand = self.draw_cards(len(self.deck))
+                else:  
+                    self.hand = self.draw_cards(4)
         else:
             filename = tools.get_filename(self.selected_card().path)
             self.help_overlay_title, self.help_overlay_title_rect = self.make_text(filename.title(),
@@ -166,8 +179,9 @@ class Game(tools.States):
             string = self.database[filename]['info']
             my_font = tools.Font.load('impact.ttf', 20)
             self.help_overlay_text_rect = pg.Rect((400, 200, 300, 300))
-            self.help_overlay_text = tools.render_textrect(string, my_font, self.help_overlay_text_rect, (216, 216, 216), (48, 48, 48, 255), 0)
-            
+            self.help_overlay_text = tools.render_textrect(string, my_font, self.help_overlay_text_rect, 
+                                                        (216, 216, 216), (48, 48, 48, 255), 0)
+
 
     def reposition_play_btn(self):
         '''place play button on top of the selected card'''
@@ -210,16 +224,15 @@ class Game(tools.States):
             card.rect.x = i * self.card_bufferX 
 
             
-    def get_hand_cards(self):
-        '''return all playable cards'''
+    def fill_deck(self):
+        '''fill deck with playable cards only'''
         for card in self.full_deck:
             if tools.get_category(card.path) not in ['roles', 'characters','other']:
                 self.deck.append(card)
 
         
-
-    def set_hand(self, card_num):
-        # self.cards_shuffle.sound.play() 
+    def draw_cards(self, card_num):
+        '''remove drawn cards from deck and add in hand'''
         picked_cards = random.sample(self.deck, card_num)
         for card in picked_cards:
             self.deck.remove(card)
@@ -248,7 +261,8 @@ class Game(tools.States):
     def entry(self):
         if not self.is_hand_set:
             self.is_hand_set = True
-            self.hand = self.set_hand(6)
+            # TEMPORARY
+            self.hand = self.draw_cards(7)
         print(f'cards in deck :{len(self.deck)}')
         print(f'cards in hand :{len(self.hand)}')
         pass#pg.mixer.music.pause()
