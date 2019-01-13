@@ -38,8 +38,8 @@ class Control():
             #'OVERLAY' : overlay.Overlay(self.screen_rect),
         }
 
-        # self.state_name = 'SPLASH' # start game from Splash state
-        self.state_name = 'MENU'
+        self.state_name = 'SPLASH' # start game from Splash state
+        # self.state_name = 'MENU'
         self.state = self.state_dict[self.state_name]
 
     def event_loop(self):

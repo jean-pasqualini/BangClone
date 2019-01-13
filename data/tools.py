@@ -259,7 +259,8 @@ class States:
             elif self.selected_index > max_ind:
                 self.selected_index = 0
             self.button_hover.sound.play()
-            
+    
+    # probably unneeded
     def create_deck(self):
         self.cards = []
         path = os.path.join(Image.path, 'cards')

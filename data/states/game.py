@@ -34,9 +34,10 @@ class Game(tools.States):
 
         self.bg_color = (255,255,255)
         self.help_overlay = False
-        self.card_bufferX = 100
-        self.card_bufferY = 25
-        
+        self.hand_card_bufferX = 100
+        self.hand_card_bufferY = 25
+        self.table_card_bufferX = 2
+        self.table_card_bufferY = 2
         self.bg = tools.Image.load('greenbg.png')
         self.bg_rect = self.bg.get_rect()
         self.is_hand_set = False
@@ -165,6 +166,8 @@ class Game(tools.States):
     def update(self, now, keys):
         if not self.help_overlay:
             self.update_hand_position()
+            self.update_table_position()
+
             # TEMPORARY
             if not self.hand and len(self.deck) >= 1:
                 if len(self.deck) < 4:
@@ -192,6 +195,7 @@ class Game(tools.States):
     def render(self, screen):
         screen.blit(self.bg, self.bg_rect)
         self.render_hand(screen)
+        self.render_table(screen)
         if self.help_overlay:
             self.render_overlay(screen)
 
@@ -205,6 +209,7 @@ class Game(tools.States):
         if c:
             screen.blit(c.surf, (c.rect.x, c.rect.y))
         
+        # render play button
         if self.selected_card():
             self.reposition_play_btn()
             self.play_card_button.render(screen)
@@ -216,14 +221,23 @@ class Game(tools.States):
         screen.blit(self.help_overlay_text, self.help_overlay_text_rect)
         sel = self.selected_card()
         screen.blit(sel.surf, self.overlay_card_position)
-            
+
+
+    def render_table(self, screen):
+        for card in self.table:
+            screen.blit(card.surf, (card.rect.x, card.rect.y))
+
+    def update_table_position(self):
+        for i, card in enumerate(self.table):
+            card.rect.y = self.screen_rect.top * 1.05 + i * self.table_card_bufferY       
+            card.rect.x = self.screen_rect.centerx + i * self.table_card_bufferX
 
     def update_hand_position(self):
         for i, card in enumerate(self.hand):
             card.rect.y = self.screen_rect.bottom - card.surf.get_height() * 1.05
             if card.selected:
-                card.rect.y -= self.card_bufferY
-            card.rect.x = i * self.card_bufferX 
+                card.rect.y -= self.hand_card_bufferY
+            card.rect.x = i * self.hand_card_bufferX 
 
             
     def fill_deck(self):

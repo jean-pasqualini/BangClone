@@ -11,8 +11,6 @@ TODO List
 * add card flip, card drop sounds
 
 ###code
-* display table on board
-* add card removed from hand and onto table if played
 * adjust splashscreen to fit any size window
 * modify card size to fit in screen
 * adjust table to fit 7 players and their area
@@ -26,6 +24,8 @@ TODO List
 * add music option on/off
 * add more content to background of main menu than just a blank fill screen
 * add self updater
+* ~~display table on board~~
+* ~~add card removed from hand and onto table if played~~
 * ~~create hand layout~~
 * ~~allow card selection~~
 * ~~modify card selection to visable part of card and not only just the left side of card~~
