@@ -61,13 +61,15 @@ class Game(tools.States):
         card = self.selected_card()
         self.hand.remove(card)
         self.table.append(card)
+        self.button_sound.sound.play()
+
     
     def get_event(self, event, keys):
         
         if self.selected_card():
             if not self.help_overlay:
                 self.play_card_button.check_event(event)
-                
+
         if event.type == pg.QUIT:
             self.quit = True
         elif event.type == pg.KEYDOWN:
@@ -123,6 +125,10 @@ class Game(tools.States):
         return c
                 
     def same_bool(self, lister):
+        '''
+        return true only if all items in lister are true 
+        or none of them are true
+        '''
         return all(lister) or not any(lister)
 
     def update(self, now, keys):
@@ -157,21 +163,21 @@ class Game(tools.States):
         if self.selected_card():
             self.reposition_play_btn()
             self.play_card_button.render(screen)
+            screen.blit(self.help_btn_image, self.help_btn_image_rect)
+
         if self.help_overlay:
             screen.blit(self.overlay_bg,(0,0))
             screen.blit(self.help_overlay_title, self.help_overlay_title_rect)
             screen.blit(self.help_overlay_text, self.help_overlay_text_rect)
             sel = self.selected_card()
             screen.blit(sel.surf, self.overlay_card_position)
-        if self.selected_card():
-            screen.blit(self.help_btn_image, self.help_btn_image_rect)
             
         #screen.blit(self.settings, self.settings_rect)
         
 
     def update_hand_position(self):
         for i, card in enumerate(self.hand):
-            card.rect.y = self.screen_rect.bottom - card.surf.get_height()
+            card.rect.y = self.screen_rect.bottom - card.surf.get_height() * 1.05
             if card.selected:
                 card.rect.y -= self.card_bufferY
             card.rect.x = i * self.card_bufferX 
@@ -184,6 +190,7 @@ class Game(tools.States):
         return hand_cards
         
     def set_hand(self, card_num):
+        # self.cards_shuffle.sound.play()
         return random.sample(self.get_hand_cards(), card_num)
         
     def create_deck(self):

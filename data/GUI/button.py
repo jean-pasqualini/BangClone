@@ -60,6 +60,7 @@ class Button(object):
         elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
             self.on_release(event)
 
+
     def on_click(self,event):
         if self.rect.collidepoint(event.pos):
             self.clicked = True

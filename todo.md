@@ -8,7 +8,7 @@ TODO List
 
 ###music/sounds
 * add more music
-* add card shuffle, card flip, card drop sounds
+* add card flip, card drop sounds
 
 ###code
 * adjust splashscreen to fit any size window

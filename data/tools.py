@@ -157,10 +157,13 @@ class States:
         self.screen_rect = self.bogus_rect
         self.button_volume = .2
         self.button_hover_volume = .1
+        self.cards_shuffle_volume = .2
         self.button_sound = Sound('button.wav')
         self.button_sound.sound.set_volume(self.button_volume)
         self.button_hover = Sound('button_hover.wav')
         self.button_hover.sound.set_volume(self.button_hover_volume)
+        self.cards_shuffle = Sound('cards_shuffle.wav')
+        self.cards_shuffle.sound.set_volume(self.cards_shuffle_volume)
         self.background_music_volume = .1
         self.background_music = Music(self.background_music_volume)
         self.bg_color = (25,25,25)
