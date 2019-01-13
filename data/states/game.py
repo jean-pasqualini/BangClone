@@ -36,8 +36,8 @@ class Game(tools.States):
         self.help_overlay = False
         self.hand_card_bufferX = 100
         self.hand_card_bufferY = 25
-        self.table_card_bufferX = 2
-        self.table_card_bufferY = 2
+        self.table_card_bufferX = 0.3
+        self.table_card_bufferY = 0.2
         self.bg = tools.Image.load('greenbg.png')
         self.bg_rect = self.bg.get_rect()
         self.is_hand_set = False
@@ -60,22 +60,21 @@ class Game(tools.States):
             'call_on_release'    : True
         }
         self.play_card_button = button.Button((25,50,175,50),(100,200,100), 
-            self.card_to_table, text='Play Card', **button_config
+            self.card_to_discard, text='Play Card', **button_config
         )
         
         
-    def card_to_table(self):
+    def card_to_discard(self):
         card = self.selected_card()
         self.hand.remove(card)
-        self.table.append(card)
+        self.discard.append(card)
         self.button_sound.sound.play()
         print(f'cards in deck :{len(self.deck)}')
         print(f'cards in hand :{len(self.hand)}')
 
 
-    def card_to_discard(self, card):
-        self.table.remove(card)
-        self.discard.append(card)
+    def card_to_table(self, card):
+        pass
     
     def get_event(self, event, keys):
         if self.selected_card():
@@ -166,7 +165,7 @@ class Game(tools.States):
     def update(self, now, keys):
         if not self.help_overlay:
             self.update_hand_position()
-            self.update_table_position()
+            self.update_table_decks_pisition()
 
             # TEMPORARY
             if not self.hand and len(self.deck) >= 1:
@@ -195,7 +194,7 @@ class Game(tools.States):
     def render(self, screen):
         screen.blit(self.bg, self.bg_rect)
         self.render_hand(screen)
-        self.render_table(screen)
+        self.render_table_decks(screen)
         if self.help_overlay:
             self.render_overlay(screen)
 
@@ -223,14 +222,21 @@ class Game(tools.States):
         screen.blit(sel.surf, self.overlay_card_position)
 
 
-    def render_table(self, screen):
-        for card in self.table:
+    def render_table_decks(self, screen):
+        for card in self.discard:
+            screen.blit(card.surf, (card.rect.x, card.rect.y))
+        for card in self.deck:
             screen.blit(card.surf, (card.rect.x, card.rect.y))
 
-    def update_table_position(self):
-        for i, card in enumerate(self.table):
+
+    def update_table_decks_pisition(self):
+        for i, card in enumerate(self.deck):
             card.rect.y = self.screen_rect.top * 1.05 + i * self.table_card_bufferY       
-            card.rect.x = self.screen_rect.centerx + i * self.table_card_bufferX
+            card.rect.x = self.screen_rect.centerx + i * self.table_card_bufferX - card.surf.get_width()
+        for i, card in enumerate(self.discard):
+            card.rect.y = self.screen_rect.top * 1.05 + i * self.table_card_bufferY       
+            card.rect.x = self.screen_rect.centerx + i * self.table_card_bufferX + 40
+
 
     def update_hand_position(self):
         for i, card in enumerate(self.hand):
