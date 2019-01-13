@@ -144,11 +144,11 @@ data = {
 }
 
 if __name__ == '__main__':
-    for k,v in data.items():
-        print(k,v['info'])
-        print(k,v.get('life', 'life none'))
-        print(k,v.get('action', 'action none'))
+    # for k,v in data.items():
+        # print(k,v['info'])
+        # print(k,v.get('life', 'life none'))
+        # print(k,v.get('action', 'action none'))
         
-    print('\nCard Types: {}'.format(len(data.values())))
-    print('Card Instances: {}'.format( sum([v['max'] for v in data.values()]) ))
+    print(f'\nCard Types: {len(data.values())}')
+    print(f'Card Instances: {sum([v["max"] for v in data.values()])}')
 

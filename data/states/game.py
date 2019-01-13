@@ -25,7 +25,7 @@ class Game(tools.States):
         self.deck = []
         self.full_deck = []
         self.database = data.data
-        self.create_deck()
+        self.create_full_deck()
         self.get_hand_cards()
 
         #self.make_deck()
@@ -65,6 +65,8 @@ class Game(tools.States):
         self.hand.remove(card)
         self.table.append(card)
         self.button_sound.sound.play()
+        print(f'cards in deck :{len(self.deck)}')
+        print(f'cards in hand :{len(self.hand)}')
 
     
     def get_event(self, event, keys):
@@ -218,10 +220,14 @@ class Game(tools.States):
 
     def set_hand(self, card_num):
         # self.cards_shuffle.sound.play() 
-        return random.sample(self.deck, card_num)
+        picked_cards = random.sample(self.deck, card_num)
+        for card in picked_cards:
+            self.deck.remove(card)
+        return picked_cards
         
 
-    def create_deck(self):
+    def create_full_deck(self):
+        '''create deck from all cards from the game'''
         path = os.path.join(tools.Image.path, 'cards')
         for root, dirs, files in os.walk(path):
             for f in files:
@@ -231,10 +237,8 @@ class Game(tools.States):
                     filename = tools.get_filename(path)
                     for i in range(self.database[filename]['max']):  
                         self.full_deck.append(card.Card(path, image))
-        #for c in self.deck:
-        #    print('{} at {}'.format(c.path, c))
-        #print(len(self.deck))
             
+
     def cleanup(self):
         pass#pg.mixer.music.unpause()
         #pg.mixer.music.stop()
@@ -245,6 +249,7 @@ class Game(tools.States):
         if not self.is_hand_set:
             self.is_hand_set = True
             self.hand = self.set_hand(6)
-        print(len(self.deck))
+        print(f'cards in deck :{len(self.deck)}')
+        print(f'cards in hand :{len(self.hand)}')
         pass#pg.mixer.music.pause()
         #pg.mixer.music.play()
