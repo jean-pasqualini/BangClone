@@ -23,8 +23,11 @@ class Game(tools.States):
         self.overlay_card_position = (100,200)
         
         self.deck = []
+        self.full_deck = []
         self.database = data.data
         self.create_deck()
+        self.get_hand_cards()
+
         #self.make_deck()
         self.bg_color = (255,255,255)
         self.help_overlay = False
@@ -87,13 +90,19 @@ class Game(tools.States):
             
         elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
             if not self.help_overlay:
-                self.select_left_side_of_card()
+                self.select_deselect_card()
             if self.help_btn_image_rect.collidepoint(pg.mouse.get_pos()):
                 if self.selected_card():
                     self.help_overlay = not self.help_overlay
 
             
-    def select_left_side_of_card(self):
+    def select_deselect_card(self):
+        '''
+        select cards if not selected yet, 
+        and deselect if it was previosly selected
+        selected and last cards can be selected every where,
+        other cards can be selected only by left side of the card
+        '''
         for card in self.hand:
             half_width = int(card.rect.width/2)
             card_left_side = card.rect.inflate(-half_width, 0)
@@ -103,22 +112,19 @@ class Game(tools.States):
                 if card.rect.collidepoint(pg.mouse.get_pos()):
                     card.selected = not card.selected
                     self.button_sound.sound.play()
-                    print('selected card')
-                    break # to not select card underneath 
+                    break # card deselected
 
             elif card == self.hand[-1]:
                 if card.rect.collidepoint(pg.mouse.get_pos()):
                     self.set_all_cards_select_to_false()
                     card.selected = True
                     self.button_sound.sound.play()
-                    print('last card')
 
             else:
                 if card_left_side.collidepoint(pg.mouse.get_pos()):
                     self.set_all_cards_select_to_false()
                     card.selected = True
                     self.button_sound.sound.play()
-                    print('regular card')
                
 
     def set_all_cards_select_to_false(self):
@@ -162,6 +168,7 @@ class Game(tools.States):
             
 
     def reposition_play_btn(self):
+        '''place play button on top of the selected card'''
         self.play_card_button.rect.center = self.selected_card().rect.center
         self.play_card_button.rect.y -= 200
 
@@ -202,16 +209,16 @@ class Game(tools.States):
 
             
     def get_hand_cards(self):
-        hand_cards = []
-        for card in self.deck:
+        '''return all playable cards'''
+        for card in self.full_deck:
             if tools.get_category(card.path) not in ['roles', 'characters','other']:
-                hand_cards.append(card)
-        return hand_cards
+                self.deck.append(card)
+
         
 
     def set_hand(self, card_num):
         # self.cards_shuffle.sound.play() 
-        return random.sample(self.get_hand_cards(), card_num)
+        return random.sample(self.deck, card_num)
         
 
     def create_deck(self):
@@ -223,7 +230,7 @@ class Game(tools.States):
                     image = pg.image.load(path)
                     filename = tools.get_filename(path)
                     for i in range(self.database[filename]['max']):  
-                        self.deck.append(card.Card(path, image))
+                        self.full_deck.append(card.Card(path, image))
         #for c in self.deck:
         #    print('{} at {}'.format(c.path, c))
         #print(len(self.deck))
@@ -238,5 +245,6 @@ class Game(tools.States):
         if not self.is_hand_set:
             self.is_hand_set = True
             self.hand = self.set_hand(6)
+        print(len(self.deck))
         pass#pg.mixer.music.pause()
         #pg.mixer.music.play()
