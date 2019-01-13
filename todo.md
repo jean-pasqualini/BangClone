@@ -14,7 +14,7 @@ TODO List
 * adjust splashscreen to fit any size window
 * ~~create hand layout~~
 * ~~allow card selection~~
-* modify card selection to visable part of card and not only just the left side of card
+* ~~modify card selection to visable part of card and not only just the left side of card~~
 * ~~add in game help on selected card~~
 * ~~add card view with database help~~
 * ~~add GUI buttons for movement in card viewer~~ 
