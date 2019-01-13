@@ -30,7 +30,7 @@ TODO List
 * add card removed from hand and onto table if played
 * display table on board
 * add more content to background of main menu than just a blank fill screen
-* add game favicon
+* ~~add game favicon~~
 * add settings options in-game
 * reorganize game state, split into classes
 * ~~add data entry for card action~~

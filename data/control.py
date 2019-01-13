@@ -2,6 +2,7 @@
 import os
 import pygame as pg
 from .states import menu, splash, viewer, game
+from . import tools
 
 class Control():
     '''
@@ -14,6 +15,10 @@ class Control():
         pg.init()
         self.monitor = (pg.display.Info().current_w, pg.display.Info().current_h)
         pg.display.set_caption('Boom')
+
+        self.icon = tools.Image.load('ai.png') # favicon
+        pg.display.set_icon(self.icon)
+
         self.screensize = (int(size[0]), int(size[1]))
         if fullscreen:
             self.screen = pg.display.set_mode(self.screensize, pg.FULLSCREEN)
