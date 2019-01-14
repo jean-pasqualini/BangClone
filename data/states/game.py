@@ -112,9 +112,8 @@ class Game(tools.States):
             
     def select_deselect_card(self):
         '''
-        select cards if not selected yet, 
-        and deselect if it was previosly selected
-        selected and last cards can be selected every where,
+        select or deselect cards
+        selected and last card can be clicked everywhere,
         other cards can be selected only by left side of the card
         '''
         for card in self.hand:
@@ -126,19 +125,21 @@ class Game(tools.States):
                 if card.rect.collidepoint(pg.mouse.get_pos()):
                     card.selected = not card.selected
                     self.button_sound.sound.play()
-                    break # card deselected
+                    return card
 
             elif card == self.hand[-1]:
                 if card.rect.collidepoint(pg.mouse.get_pos()):
                     self.set_all_cards_select_to_false()
                     card.selected = True
                     self.button_sound.sound.play()
+                    return card
 
             else:
                 if card_left_side.collidepoint(pg.mouse.get_pos()):
                     self.set_all_cards_select_to_false()
                     card.selected = True
                     self.button_sound.sound.play()
+                    return card
                
 
     def set_all_cards_select_to_false(self):
