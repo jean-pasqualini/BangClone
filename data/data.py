@@ -140,6 +140,10 @@ data = {
     'backend':{
         'info':'Cards back side',
         'max':0
+    },
+    'deck_thickness':{
+        'info':'Cards for offset thickness',
+        'max':0
     }
 }
 

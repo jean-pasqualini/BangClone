@@ -14,8 +14,7 @@ TODO List
 * make responsive card viewer 
 * different table background and player positions for 4-7 players
 * fixed maximum length of hand, and maximum gap between cards
-	*  make hand curved
-	* test
+	* make hand curved
 * add active cards higher and under the hand
 * modify cards, deck, and players size to fit in screen
 * adjust table to fit 7 players and their area
