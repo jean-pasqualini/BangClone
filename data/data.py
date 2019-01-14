@@ -142,7 +142,7 @@ data = {
         'max':0
     },
     'deck_thickness':{
-        'info':'Cards for offset thickness',
+        'info':'Card for offset thickness',
         'max':0
     }
 }

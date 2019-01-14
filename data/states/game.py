@@ -24,13 +24,16 @@ class Game(tools.States):
         self.database = data.data
 
         self.deck = []
-        self.full_deck = []
-        self.discard = []
+        self.full_deck = [] # is it needed here?
         self.create_full_deck()
         self.fill_deck()
 
         self.table = []
         self.discard = []
+        self.backend_path = os.path.join(tools.Image.path, 'cards/other/backend.png')
+        self.thickness_path = os.path.join(tools.Image.path, 'cards/other/deck_thickness.png')
+        self.backend_card = tools.Card(self.backend_path, pg.image.load(self.backend_path))
+        self.deck_thickness_card = tools.Card(self.thickness_path, pg.image.load(self.thickness_path))
 
         self.bg_color = (255,255,255)
         self.help_overlay = False
@@ -71,6 +74,8 @@ class Game(tools.States):
         self.button_sound.sound.play()
         print(f'cards in deck :{len(self.deck)}')
         print(f'cards in hand :{len(self.hand)}')
+        print(f'thickness of play deck is: {str(400 - (self.deck_thickness_card.rect.x))} px')
+
 
 
     def card_to_table(self, card):
@@ -223,19 +228,26 @@ class Game(tools.States):
 
 
     def render_table_decks(self, screen):
-        for card in self.discard:
-            screen.blit(card.surf, (card.rect.x, card.rect.y))
-        for card in self.deck:
-            screen.blit(card.surf, (card.rect.x, card.rect.y))
+        screen.blit(self.deck_thickness_card.surf, 
+                    (self.deck_thickness_card.rect.x, self.deck_thickness_card.rect.y)
+                    )
+
+        screen.blit(self.backend_card.surf, (400, 10))
+        if self.discard:
+            screen.blit(self.discard[-1].surf, (610, 10))
 
 
     def update_table_decks_pisition(self):
-        for i, card in enumerate(self.deck):
-            card.rect.y = self.screen_rect.top * 1.05 + i * self.table_card_bufferY       
-            card.rect.x = self.screen_rect.centerx + i * self.table_card_bufferX - card.surf.get_width()
-        for i, card in enumerate(self.discard):
-            card.rect.y = self.screen_rect.top * 1.05 + i * self.table_card_bufferY       
-            card.rect.x = self.screen_rect.centerx + i * self.table_card_bufferX + 40
+        self.deck_thickness_card.rect.y = 10 - (0.01 * len(self.deck))
+        self.deck_thickness_card.rect.x = 400 - (0.2 * len(self.deck))
+
+
+        # for i, card in enumerate(self.deck):
+        #     card.rect.y = self.screen_rect.top * 1.05 + i * self.table_card_bufferY       
+        #     card.rect.x = self.screen_rect.centerx + i * self.table_card_bufferX - card.surf.get_width()
+        # for i, card in enumerate(self.discard):
+        #     card.rect.y = self.screen_rect.top * 1.05 + i * self.table_card_bufferY       
+        #     card.rect.x = self.screen_rect.centerx + i * self.table_card_bufferX + 40
 
 
     def update_hand_position(self):
@@ -287,5 +299,5 @@ class Game(tools.States):
             self.hand = self.draw_cards(7)
         print(f'cards in deck :{len(self.deck)}')
         print(f'cards in hand :{len(self.hand)}')
-        pass#pg.mixer.music.pause()
+        #pg.mixer.music.pause()
         #pg.mixer.music.play()
