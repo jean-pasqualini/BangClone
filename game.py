@@ -13,8 +13,8 @@ parser.add_argument('-f' , '--fullscreen', action='store_true',
     help='start program with fullscreen')
 parser.add_argument('-d' , '--difficulty', default='medium',
     help='where DIFFICULTY is one of the strings [hard, medium, easy], set AI difficulty, default is medium, ')
-parser.add_argument('-s' , '--size', nargs=2, default=[800,600], metavar=('WIDTH', 'HEIGHT'),
-    help='set window size to WIDTH HEIGHT, defualt is 800 600')
+parser.add_argument('-s' , '--size', nargs=2, default=[1024,700], metavar=('WIDTH', 'HEIGHT'),
+    help='set window size to WIDTH HEIGHT, defualt is 1024 768')
 args = vars(parser.parse_args())
 
 if __name__ == '__main__':

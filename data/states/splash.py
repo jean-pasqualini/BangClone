@@ -7,16 +7,38 @@ class Splash(tools.States):
         tools.States.__init__(self)
         self.screen_rect = screen_rect
         self.next = "MENU"
-        self.timeout = 3
+        self.timeout = 4
         self.start_time = 0
-
         self.cover = pg.Surface((screen_rect.width, screen_rect.height))
-        self.cover.fill(0)
+        self.cover.fill((255, 255, 255))
         self.cover_alpha = 256
         self.alpha_step = 3
 
+        self.pygame_surf = pg.image.load('resources/graphics/pygame_logo.png').convert_alpha()
+        self.python_surf = pg.image.load('resources/graphics/python_powered.png').convert_alpha()
+        self.python_logo = pg.transform.scale(self.python_surf, (250, 214))
+        self.pygame_logo = pg.transform.scale(self.pygame_surf, (250, 99))
+
+        # responsive settings
+        self.gap_x = 10
+        self.gap_y = 10
+        self.bottom = self.screen_rect.bottom
+        self.python_logo_height = self.python_logo.get_rect().height
+        self.pygame_logo_height = self.pygame_logo.get_rect().height
+        self.right = self.screen_rect.right
+        self.pygame_logo_width = self.pygame_logo.get_rect().width
+
+        self.python_y = self.bottom - self.python_logo_height - self.gap_y
+        self.python_x = self.gap_x
+
+        self.pygame_x = self.right - self.pygame_logo_width - self.gap_x
+        self.pygame_y = self.bottom - ((self.python_logo_height - self.pygame_logo_height)/2 + 
+                         self.pygame_logo_height) # horizontally align center logos
+
         self.image = pg.image.load('resources/graphics/splash_page.png').convert_alpha()
-        text = ["Brought to you by",'metulburr']
+
+        text = ["Brought to you by",'metulburr & tarn']
+        # center Y here
         self.rendered_text = self.make_text_list("Fixedsys500c",50,text,(0,0,0),320,50)
 
     def make_text_list(self,font,size,strings,color,start_y,y_space):
@@ -34,12 +56,14 @@ class Splash(tools.States):
     def update(self,surface,keys):
         self.current_time = pg.time.get_ticks()
         self.cover.set_alpha(self.cover_alpha)
-        self.cover_alpha = max(self.cover_alpha-self.alpha_step,0)
-        if self.current_time-self.start_time > 1000.0*self.timeout:
+        self.cover_alpha = max(self.cover_alpha - self.alpha_step,0)
+        if self.current_time - self.start_time > 1000.0*self.timeout:
             self.done = True
             
     def render(self, screen):
-        screen.blit(self.image, (0,0))
+        screen.blit(self.python_logo, (self.python_x, self.python_y))
+        screen.blit(self.pygame_logo, (self.pygame_x, self.pygame_y))
+
         screen.blit(self.cover,(0,0))
         for msg in self.rendered_text:
             screen.blit(*msg)
