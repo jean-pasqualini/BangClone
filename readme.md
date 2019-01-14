@@ -2,7 +2,7 @@
 
 http://www.pygame.org/project-Boom-2891-4720.html
 
-###arguments
+# arguments
 run game with defaults
 
     python game.py
