@@ -1,4 +1,5 @@
-[![Logo](http://i.imgur.com/QE0486f.png)](http://i.imgur.com)
+![image](https://user-images.githubusercontent.com/25755345/51129689-be807880-1833-11e9-8165-e82f46781020.png)
+
 
 http://www.pygame.org/project-Boom-2891-4720.html
 
@@ -17,6 +18,6 @@ difficulty
     python game.py -d hard
 screen size
 
-    python game.py -s 1024 800
+    python game.py -s 1280 720
     
 
