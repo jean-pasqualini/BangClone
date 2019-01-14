@@ -1,16 +1,16 @@
 TODO List
 
-####graphics
+## graphics
 * transer all cards from original game 
 * transfer gold rush expansion pack cards into Boom cards
 * transfer dodge city expansion pack cards into Boom cards
 * ~~create backend side of card~~
 
-####music/sounds
+## music/sounds
 * add more music
 * add card flip, card drop sounds
 
-####code
+## code
 * make responsive card viewer 
 * different table background and player positions for 4-7 players
 * fixed maximum length of hand, and maximum gap between cards
