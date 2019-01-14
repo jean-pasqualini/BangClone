@@ -199,8 +199,8 @@ class Game(tools.States):
 
     def render(self, screen):
         screen.blit(self.bg, self.bg_rect)
-        self.render_hand(screen)
         self.render_table_decks(screen)
+        self.render_hand(screen)
         if self.help_overlay:
             self.render_overlay(screen)
 
@@ -241,7 +241,6 @@ class Game(tools.States):
     def update_table_decks_pisition(self):
         self.deck_thickness_card.rect.y = 10 - (0.01 * len(self.deck))
         self.deck_thickness_card.rect.x = 400 - (0.2 * len(self.deck))
-
 
         # for i, card in enumerate(self.deck):
         #     card.rect.y = self.screen_rect.top * 1.05 + i * self.table_card_bufferY       
