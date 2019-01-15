@@ -14,9 +14,8 @@ class Game(tools.States):
         self.overlay_bg.set_alpha(200)
         self.overlay_card_position = (100, 200)
         self.database = data.data
-
-        self.deck = []
-        self.full_deck = []
+        self.deck = []  # only playable cards
+        self.full_deck = []  # all cards
         self.card_size = None
         self.hand = []
         self.create_full_deck()
@@ -37,9 +36,13 @@ class Game(tools.States):
         self.bg_color = (255, 255, 255)
         self.help_overlay = False
         self.hand_card_bufferX = self.card_size[0] / 2
+
+        # x and y to place deck in the middle of the screen (a bit left)
+        self.play_deck_x = self.screen_rect.centerx - self.card_size[0]
+        self.play_deck_y = self.screen_rect.centery - self.card_size[1] / 2
+
+        # gap between cards in 
         self.hand_card_bufferY = 25
-        self.table_card_bufferX = 0.3
-        self.table_card_bufferY = 0.2
         self.bg = tools.Image.load("greenbg.png")
         self.bg_rect = self.bg.get_rect()
         self.is_hand_set = False
@@ -240,20 +243,13 @@ class Game(tools.States):
             (self.deck_thickness_card.rect.x, self.deck_thickness_card.rect.y),
         )
 
-        screen.blit(self.backend_card.surf, (400, 10))
+        screen.blit(self.backend_card.surf, (self.play_deck_x, self.play_deck_y))
         if self.discard:
-            screen.blit(self.discard[-1].surf, (610, 10))
+            screen.blit(self.discard[-1].surf, (self.play_deck_x + self.card_size[0] * 1.1, self.play_deck_y))
 
     def update_table_decks_pisition(self):
-        self.deck_thickness_card.rect.y = 10 - (0.01 * len(self.deck))
-        self.deck_thickness_card.rect.x = 400 - (0.2 * len(self.deck))
-
-        # for i, card in enumerate(self.deck):
-        #     card.rect.y = self.screen_rect.top * 1.05 + i * self.table_card_bufferY
-        #     card.rect.x = self.screen_rect.centerx + i * self.table_card_bufferX - card.surf.get_width()
-        # for i, card in enumerate(self.discard):
-        #     card.rect.y = self.screen_rect.top * 1.05 + i * self.table_card_bufferY
-        #     card.rect.x = self.screen_rect.centerx + i * self.table_card_bufferX + 40
+        self.deck_thickness_card.rect.y = self.play_deck_y - (0.01 * len(self.deck))
+        self.deck_thickness_card.rect.x = self.play_deck_x - (0.2 * len(self.deck))
 
     def update_hand_position(self):
         for i, card in enumerate(self.hand):
