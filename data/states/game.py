@@ -10,13 +10,6 @@ class Game(tools.States):
     def __init__(self, screen_rect): 
         super().__init__() 
         self.screen_rect = screen_rect
-        #self.score_text, self.score_rect = self.make_text("SCOREBOARD_PLACEHOLDER",
-        #    (255,255,255), (screen_rect.centerx,100), 50)
-        #self.help_overlay_title, self.help_overlay_title_rect = self.make_text("help_overlay",
-        #    (255,255,255), screen_rect.center, 50)
-        #self.help_overlay_text, self.help_overlay_text_rect = self.make_text("help_overlay",
-        #    (255,255,255), screen_rect.center, 50)
-            
         self.overlay_bg = pg.Surface((screen_rect.width, screen_rect.height))
         self.overlay_bg.fill(0)
         self.overlay_bg.set_alpha(200)
@@ -24,7 +17,7 @@ class Game(tools.States):
         self.database = data.data
 
         self.deck = []
-        self.full_deck = [] # is it needed here?
+        self.full_deck = []
         self.create_full_deck()
         self.fill_deck()
 
@@ -111,11 +104,11 @@ class Game(tools.States):
 
             
     def select_deselect_card(self):
-        '''
+        """
         select or deselect cards
         selected and last card can be clicked everywhere,
         other cards can be selected only by left side of the card
-        '''
+        """
         for card in self.hand:
             half_width = int(card.rect.width/2)
             card_left_side = card.rect.inflate(-half_width, 0)
@@ -161,10 +154,10 @@ class Game(tools.States):
            
 
     def same_bool(self, lister):
-        '''
+        """
         return true only if all items in lister are true 
         or none of them are true
-        '''
+        """
         return all(lister) or not any(lister)
 
 
@@ -192,7 +185,7 @@ class Game(tools.States):
 
 
     def reposition_play_btn(self):
-        '''place play button on top of the selected card'''
+        """place play button on top of the selected card"""
         self.play_card_button.rect.center = self.selected_card().rect.center
         self.play_card_button.rect.y -= 200
 
@@ -259,14 +252,14 @@ class Game(tools.States):
 
             
     def fill_deck(self):
-        '''fill deck with playable cards only'''
+        """fill deck with playable cards only"""
         for card in self.full_deck:
             if tools.get_category(card.path) not in ['roles', 'characters','other']:
                 self.deck.append(card)
 
         
     def draw_cards(self, card_num):
-        '''remove drawn cards from deck and add in hand'''
+        """remove drawn cards from deck and add in hand"""
         picked_cards = random.sample(self.deck, card_num)
         for card in picked_cards:
             self.deck.remove(card)
@@ -274,7 +267,7 @@ class Game(tools.States):
         
 
     def create_full_deck(self):
-        '''create deck from all cards from the game'''
+        """create deck from all cards from the game"""
         path = os.path.join(tools.Image.path, 'cards')
         for root, dirs, files in os.walk(path):
             for f in files:

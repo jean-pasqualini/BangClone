@@ -6,7 +6,7 @@ import shutil
 import random
 
 def clean_files():
-    '''remove all pyc files and __pycache__ direcetories in subdirectory'''
+    """remove all pyc files and __pycache__ direcetories in subdirectory"""
     for root, dirs, files in os.walk('.'):
         for dir in dirs:
             if dir == '__pycache__':
@@ -20,11 +20,11 @@ def clean_files():
                 os.remove(path)
                 
 def get_category(path):
-    '''get category from image fullpath of card'''
+    """get category from image fullpath of card"""
     return os.path.split(os.path.split(path)[0])[1]
     
 def get_filename(path):
-    '''get filename from image fullpath of card'''
+    """get filename from image fullpath of card"""
     return os.path.split(os.path.splitext(path)[0])[1]
 
 
@@ -150,7 +150,7 @@ class Music:
         pg.mixer.music.load(self.tracks[0])
 
 class States:
-    '''State parent class'''
+    """State parent class"""
     def __init__(self):        
         self.bogus_rect = pg.Surface([0,0]).get_rect()
         self.screen_rect = self.bogus_rect
@@ -220,7 +220,7 @@ class States:
         return text,rect
         
     def pre_render_options(self):
-        '''handle selected and deselected menu options render '''
+        """handle selected and deselected menu options render """
         font_deselect = Font.load('impact.ttf', 25)
         font_selected = Font.load('impact.ttf', 35)
 
@@ -235,7 +235,7 @@ class States:
         self.rendered = rendered_msg
         
     def select_option(self, i):
-        '''select menu option via keys or mouse'''
+        """select menu option via keys or mouse"""
         if i == len(self.next_list):
             self.quit = True
         else:
@@ -245,7 +245,7 @@ class States:
             self.selected_index = 0
 
     def change_selected_option(self, op=0):
-        '''change highlighted menu option'''
+        """change highlighted menu option"""
         for i,opt in enumerate(self.rendered["des"]):
             if opt[1].collidepoint(pg.mouse.get_pos()):
                 self.selected_index = i

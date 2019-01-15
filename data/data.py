@@ -1,4 +1,4 @@
-'''temporary database: table for cards'''
+"""temporary database: table for cards"""
 
 data = {
 #roles

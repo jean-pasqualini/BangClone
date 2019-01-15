@@ -5,11 +5,11 @@ from .states import menu, splash, viewer, game
 from . import tools
 
 class Control():
-    '''
+    """
     game controller class:
     - parses input parameters
     - sets screen, clock, event handler, state changer, and main game loop
-    '''
+    """
     def __init__(self, fullscreen, difficulty, size):
         pg.mixer.pre_init(44100, -16, 1, 512)
         pg.init()
@@ -61,7 +61,7 @@ class Control():
 
 
     def run(self):
-        '''main game loop'''
+        """main game loop"""
         while not self.done:
             if self.state.quit:
                 self.done = True

@@ -40,7 +40,7 @@ class Viewer(tools.States):
 
 
     def create_deck(self):
-        '''parse all cards from data (temporary database)'''
+        """create deck of all unique cards"""
         self.cards = []
         path = os.path.join(tools.Image.path, 'cards')
         for root, dirs, files in os.walk(path):
