@@ -4,7 +4,7 @@ from .. import tools
 
 class Splash(tools.States):
     def __init__(self, screen_rect):
-        tools.States.__init__(self)
+        super().__init__()
         self.text = ['Brought to you by','metulburr & tarn']
         self.screen_rect = screen_rect
         self.next = 'MENU'

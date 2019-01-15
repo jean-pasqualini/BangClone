@@ -8,7 +8,7 @@ import random
 
 class Game(tools.States):
     def __init__(self, screen_rect): 
-        tools.States.__init__(self)
+        super().__init__() 
         self.screen_rect = screen_rect
         #self.score_text, self.score_rect = self.make_text("SCOREBOARD_PLACEHOLDER",
         #    (255,255,255), (screen_rect.centerx,100), 50)

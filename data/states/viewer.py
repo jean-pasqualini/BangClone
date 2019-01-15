@@ -9,7 +9,7 @@ from ..card import Card #States.set_cards()
 
 class Viewer(tools.States):
     def __init__(self, screen_rect):
-        tools.States.__init__(self)
+        super().__init__()
         self.screen_rect = screen_rect
         self.options = ['Back']
         self.next_list = ['MENU']

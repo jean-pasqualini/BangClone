@@ -6,7 +6,7 @@ import random
 
 class Menu(tools.States):
     def __init__(self, screen_rect):
-        tools.States.__init__(self)
+        super().__init__()
         self.screen_rect = screen_rect
         self.options = ['Play', 'View Cards', 'Quit']
         self.next_list = ['GAME', 'CARDVIEW']
