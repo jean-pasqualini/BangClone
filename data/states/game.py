@@ -18,19 +18,20 @@ class Game(tools.States):
 
         self.deck = []
         self.full_deck = []
+        self.card_size = None
+        self.hand = []
         self.create_full_deck()
         self.fill_deck()
-
         self.table = []
         self.discard = []
         self.backend_path = os.path.join(tools.Image.path, 'cards/other/backend.png')
         self.thickness_path = os.path.join(tools.Image.path, 'cards/other/deck_thickness.png')
-        self.backend_card = card.Card(self.backend_path, pg.image.load(self.backend_path))
-        self.deck_thickness_card = card.Card(self.thickness_path, pg.image.load(self.thickness_path))
+        self.backend_card = card.Card(self.backend_path, pg.image.load(self.backend_path), self.screen_rect)
+        self.deck_thickness_card = card.Card(self.thickness_path, pg.image.load(self.thickness_path), self.screen_rect)
 
         self.bg_color = (255,255,255)
         self.help_overlay = False
-        self.hand_card_bufferX = 100
+        self.hand_card_bufferX = self.card_size[0]/2  # MAGIC HEREEEEEEEEEEEEE
         self.hand_card_bufferY = 25
         self.table_card_bufferX = 0.3
         self.table_card_bufferY = 0.2
@@ -104,8 +105,7 @@ class Game(tools.States):
 
             
     def select_deselect_card(self):
-        """
-        select or deselect cards
+        """Select or deselect cards
         selected and last card can be clicked everywhere,
         other cards can be selected only by left side of the card
         """
@@ -154,8 +154,7 @@ class Game(tools.States):
            
 
     def same_bool(self, lister):
-        """
-        return true only if all items in lister are true 
+        """Return true only if all items in lister are true 
         or none of them are true
         """
         return all(lister) or not any(lister)
@@ -267,7 +266,7 @@ class Game(tools.States):
         
 
     def create_full_deck(self):
-        """create deck from all cards from the game"""
+        """Create deck from all cards from the game"""
         path = os.path.join(tools.Image.path, 'cards')
         for root, dirs, files in os.walk(path):
             for f in files:
@@ -276,7 +275,8 @@ class Game(tools.States):
                     image = pg.image.load(path)
                     filename = tools.get_filename(path)
                     for i in range(self.database[filename]['max']):  
-                        self.full_deck.append(card.Card(path, image))
+                        self.full_deck.append(card.Card(path, image, self.screen_rect))
+        self.card_size = self.full_deck[0].rect.size
             
 
     def cleanup(self):
