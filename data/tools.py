@@ -174,8 +174,8 @@ class States:
         self.last_option = None
         self.gametitle = 'Boom'
         
-        self.menu_option_deselect = (50,50,50)
-        self.menu_option_select = (255,255,255)
+        self.menu_option_deselect = (130,10,10)
+        self.menu_option_select = (235,25,25)
         self.title_color = (50,50,50)
         self.text_basic_color = (255,255,255)
         self.text_hover_color = (100,100,100)

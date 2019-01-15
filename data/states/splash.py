@@ -17,6 +17,7 @@ class Splash(tools.States):
 
         self.pygame_surf = pg.image.load('resources/graphics/pygame_logo.png').convert_alpha()
         self.python_surf = pg.image.load('resources/graphics/python_powered.png').convert_alpha()
+        self.bang_surf = pg.image.load('resources/graphics/bang_logo.png').convert_alpha()
         self.python_logo = pg.transform.scale(self.python_surf, (250, 214))
         self.pygame_logo = pg.transform.scale(self.pygame_surf, (250, 99))
 
@@ -57,6 +58,7 @@ class Splash(tools.States):
         return selected_font.render(msg,1,color)
 
     def update(self,surface,keys):
+        self.bang_surf.set_alpha(100)
         self.current_time = pg.time.get_ticks()
         self.cover.set_alpha(self.cover_alpha)
         self.cover_alpha = max(self.cover_alpha - self.alpha_step,0)
@@ -66,10 +68,13 @@ class Splash(tools.States):
     def render(self, screen):
         screen.blit(self.python_logo, (self.python_x, self.python_y))
         screen.blit(self.pygame_logo, (self.pygame_x, self.pygame_y))
+        screen.blit(self.bang_surf, (int(self.screen_rect.center[0] - self.bang_surf.get_rect().width/2), 
+                                     int(self.screen_rect.center[1] - self.bang_surf.get_rect().height/2 - 50))
+                                    )
 
         screen.blit(self.cover,(0,0))
-        for msg in self.rendered_text:
-            screen.blit(*msg)
+        # for msg in self.rendered_text:
+            # screen.blit(*msg)
 
     def get_event(self,event, keys):
         if event.type == pg.QUIT:

@@ -31,7 +31,7 @@ class Game(tools.States):
 
         self.bg_color = (255,255,255)
         self.help_overlay = False
-        self.hand_card_bufferX = self.card_size[0]/2  # MAGIC HEREEEEEEEEEEEEE
+        self.hand_card_bufferX = self.card_size[0]/2  
         self.hand_card_bufferY = 25
         self.table_card_bufferX = 0.3
         self.table_card_bufferY = 0.2

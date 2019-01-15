@@ -11,6 +11,7 @@ class Menu(tools.States):
         self.options = ['Play', 'View Cards', 'Quit']
         self.next_list = ['GAME', 'CARDVIEW']
         self.title, self.title_rect = self.make_text('Boom', self.title_color, (self.screen_rect.centerx, 75), 150)
+        self.title_logo = pg.image.load('resources/graphics/bang_logo_bw.png').convert_alpha()
         self.pre_render_options()
         self.from_bottom = 200
         self.spacer = 75
@@ -40,7 +41,12 @@ class Menu(tools.States):
 
     def render(self, screen):
         screen.fill(self.bg_color)
-        screen.blit(self.title,self.title_rect)
+        # screen.blit(self.title,self.title_rect)
+        screen.blit(self.title_logo, (int(self.screen_rect.center[0] - self.title_logo.get_rect().width/2), 
+                                     int(self.screen_rect.center[1] - self.title_logo.get_rect().height/2 - 50))
+                                    )
+
+        
         for i,opt in enumerate(self.rendered["des"]):
             opt[1].center = (self.screen_rect.centerx, self.from_bottom+i*self.spacer)
             if i == self.selected_index:

@@ -4,7 +4,7 @@ class Card:
     def __init__(self, path, image, screen_rect=None):
         if screen_rect:
             image_rect = image.get_rect()
-            scale_factor = 4
+            scale_factor = 3.5
             self.surf = pg.transform.scale(image, (int((screen_rect.height / scale_factor)/1.55), 
                                                    int(screen_rect.height / scale_factor)
                                                    )
