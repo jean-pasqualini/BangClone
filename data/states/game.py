@@ -32,8 +32,8 @@ class Game(tools.States):
         self.discard = []
         self.backend_path = os.path.join(tools.Image.path, 'cards/other/backend.png')
         self.thickness_path = os.path.join(tools.Image.path, 'cards/other/deck_thickness.png')
-        self.backend_card = tools.Card(self.backend_path, pg.image.load(self.backend_path))
-        self.deck_thickness_card = tools.Card(self.thickness_path, pg.image.load(self.thickness_path))
+        self.backend_card = card.Card(self.backend_path, pg.image.load(self.backend_path))
+        self.deck_thickness_card = card.Card(self.thickness_path, pg.image.load(self.thickness_path))
 
         self.bg_color = (255,255,255)
         self.help_overlay = False

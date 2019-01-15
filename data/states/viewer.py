@@ -4,6 +4,8 @@ import pygame as pg
 from .. import tools, data
 from ..GUI import button
 import os
+from ..card import Card #States.set_cards()
+
 
 class Viewer(tools.States):
     def __init__(self, screen_rect):
@@ -35,6 +37,20 @@ class Viewer(tools.States):
         self.prev_button = button.Button((225,150,100,25),(100,100,100), 
             lambda x=-1:self.switch_card(x), text='Previous', **button_config
         )
+
+
+    def create_deck(self):
+        '''parse all cards from data (temporary database)'''
+        self.cards = []
+        path = os.path.join(tools.Image.path, 'cards')
+        for root, dirs, files in os.walk(path):
+            for f in files:
+                if f.endswith('.png'):
+                    path = os.path.abspath(os.path.join(root, f))
+                    image = pg.image.load(path)
+                    self.cards.append(Card(path, image))    
+
+
     def callback_test(self):
         print('callback')
         

@@ -4,7 +4,6 @@ import pygame as pg
 import os
 import shutil
 import random
-from .card import Card #States.set_cards()
 
 def clean_files():
     '''remove all pyc files and __pycache__ direcetories in subdirectory'''
@@ -151,7 +150,7 @@ class Music:
         pg.mixer.music.load(self.tracks[0])
 
 class States:
-    '''TODO'''
+    '''State parent class'''
     def __init__(self):        
         self.bogus_rect = pg.Surface([0,0]).get_rect()
         self.screen_rect = self.bogus_rect
@@ -260,13 +259,4 @@ class States:
                 self.selected_index = 0
             self.button_hover.sound.play()
     
-    # probably unneeded
-    def create_deck(self):
-        self.cards = []
-        path = os.path.join(Image.path, 'cards')
-        for root, dirs, files in os.walk(path):
-            for f in files:
-                if f.endswith('.png'):
-                    path = os.path.abspath(os.path.join(root, f))
-                    image = pg.image.load(path)
-                    self.cards.append(Card(path, image))
+
