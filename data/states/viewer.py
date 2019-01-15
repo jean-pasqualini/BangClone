@@ -108,6 +108,12 @@ class Viewer(tools.States):
 
             elif event.key == self.keybinding["select"]:
                 self.select_option(self.selected_index)
+
+            elif event.key == self.keybinding["back"]:
+                self.button_sound.sound.play()
+                self.done = True
+                self.next = "MENU"
+                
         elif event.type == self.background_music.track_end:
             self.background_music.track = (self.background_music.track + 1) % len(
                 self.background_music.tracks

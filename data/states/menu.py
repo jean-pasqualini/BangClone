@@ -28,6 +28,10 @@ class Menu(tools.States):
                 self.change_selected_option(-1)
             elif event.key in [pg.K_DOWN, pg.K_s]:
                 self.change_selected_option(1)
+            elif event.key == self.keybinding["back"]:
+                self.button_sound.sound.play()
+                self.done = True
+                self.next = "MENU"
 
             elif event.key == pg.K_RETURN:
                 self.select_option(self.selected_index)
