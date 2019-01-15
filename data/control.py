@@ -1,22 +1,23 @@
-
 import os
 import pygame as pg
 from .states import menu, splash, viewer, game
 from . import tools
 
-class Control():
+
+class Control:
     """
     game controller class:
     - parses input parameters
     - sets screen, clock, event handler, state changer, and main game loop
     """
+
     def __init__(self, fullscreen, difficulty, size):
         pg.mixer.pre_init(44100, -16, 1, 512)
         pg.init()
         self.monitor = (pg.display.Info().current_w, pg.display.Info().current_h)
-        pg.display.set_caption('Boom')
+        pg.display.set_caption("Boom")
 
-        self.icon = tools.Image.load('ai.png') # favicon
+        self.icon = tools.Image.load("ai.png")  # favicon
         pg.display.set_icon(self.icon)
 
         self.screensize = (int(size[0]), int(size[1]))
@@ -24,7 +25,7 @@ class Control():
             # set fullscreen mode with maximum possible resolution of screen
             self.screen = pg.display.set_mode(self.monitor, pg.FULLSCREEN)
         else:
-            os.environ['SDL_VIDEO_CENTERED'] = 'True'
+            os.environ["SDL_VIDEO_CENTERED"] = "True"
             self.screen = pg.display.set_mode(self.screensize)
         self.screen_rect = self.screen.get_rect()
         self.clock = pg.time.Clock()
@@ -32,14 +33,14 @@ class Control():
         self.keys = pg.key.get_pressed()
         self.done = False
         self.state_dict = {
-            'MENU'     : menu.Menu(self.screen_rect),
-            'SPLASH'   : splash.Splash(self.screen_rect),
-            'CARDVIEW' : viewer.Viewer(self.screen_rect),
-            'GAME'     : game.Game(self.screen_rect),
+            "MENU": menu.Menu(self.screen_rect),
+            "SPLASH": splash.Splash(self.screen_rect),
+            "CARDVIEW": viewer.Viewer(self.screen_rect),
+            "GAME": game.Game(self.screen_rect),
             #'OVERLAY' : overlay.Overlay(self.screen_rect),
         }
 
-        self.state_name = 'SPLASH' # start game from Splash state
+        self.state_name = "SPLASH"  # start game from Splash state
         # self.state_name = 'MENU'
         self.state = self.state_dict[self.state_name]
 
@@ -47,7 +48,7 @@ class Control():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.quit = True
-            elif event.type in (pg.KEYDOWN,pg.KEYUP):
+            elif event.type in (pg.KEYDOWN, pg.KEYUP):
                 self.keys = pg.key.get_pressed()
             self.state.get_event(event, self.keys)
 
@@ -58,7 +59,6 @@ class Control():
             self.state.done = False
             self.state = self.state_dict[self.state_name]
             self.state.entry()
-
 
     def run(self):
         """main game loop"""
