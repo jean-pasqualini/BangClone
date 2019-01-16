@@ -79,9 +79,7 @@ class Game(tools.States):
         self.button_sound.sound.play()
         print(f"cards in deck :{len(self.deck)}")
         print(f"cards in hand :{len(self.hand)}")
-        print(
-            f"thickness of play deck is: {str(400 - (self.deck_thickness_card.rect.x))} px"
-        )
+
 
     def card_to_table(self, card):
         pass
