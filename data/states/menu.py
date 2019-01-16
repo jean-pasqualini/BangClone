@@ -15,9 +15,9 @@ class Menu(tools.States):
         self.title_logo = pg.image.load(
             "resources/graphics/bang_logo_bw.png"
         ).convert_alpha()
-        self.pre_render_options()
+        self.pre_render_options(self.screen_rect.width)
         self.from_bottom = 200
-        self.spacer = 75
+        self.spacer = 100 * self.screen_rect.width / 1000
 
     def get_event(self, event, keys):
         if event.type == pg.QUIT:
@@ -62,7 +62,7 @@ class Menu(tools.States):
         for i, opt in enumerate(self.rendered["des"]):
             opt[1].center = (
                 self.screen_rect.centerx,
-                self.from_bottom + i * self.spacer,
+                self.screen_rect.centery + (i * self.spacer) - self.spacer * len(self.rendered) / 2,
             )
             if i == self.selected_index:
                 rend_img, rend_rect = self.rendered["sel"][i]

@@ -239,10 +239,11 @@ class States:
         rect = text.get_rect(center=center)
         return text, rect
 
-    def pre_render_options(self):
+    def pre_render_options(self, screen_width):
         """handle selected and deselected menu options render """
-        font_deselect = Font.load("impact.ttf", 25)
-        font_selected = Font.load("impact.ttf", 35)
+        font_deselect = Font.load("impact.ttf", int(3.5 * screen_width / 100)) 
+        font_selected = Font.load("impact.ttf", int(4.5 * screen_width / 100))
+        print(int(3.5 * screen_width / 100))
 
         rendered_msg = {"des": [], "sel": []}
         for option in self.options:

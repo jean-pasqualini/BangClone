@@ -15,7 +15,7 @@ class Viewer(tools.States):
             "Card Viewer", self.title_color, (self.screen_rect.centerx, 75), 150
         )
 
-        self.pre_render_options()
+        self.pre_render_options(self.screen_rect.width)
         self.from_bottom = 550
         self.spacer = 75
         self.card_offsetY = 55
