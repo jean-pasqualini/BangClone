@@ -8,7 +8,7 @@ class Splash(tools.States):
         self.text = ["Brought to you by", "metulburr & tarn"]
         self.screen_rect = screen_rect
         self.next = "MENU"
-        self.timeout = 9
+        self.timeout = 5
         self.start_time = 0
         self.cover = pg.Surface((screen_rect.width, screen_rect.height))
         self.cover.fill((255, 255, 255))
@@ -46,12 +46,9 @@ class Splash(tools.States):
             + self.pygame_logo_height
         )  # horizontally align center logos
 
-        self.image = pg.image.load("resources/graphics/splash_page.png").convert_alpha()
-
-        # center Y here
-        self.rendered_text = self.make_text_list(
-            "Fixedsys500c", 50, self.text, (0, 0, 0), self.center_y, 50
-        )
+        # self.rendered_text = self.make_text_list(
+        #     "Fixedsys500c", 50, self.text, (0, 0, 0), self.center_y, 50
+        # )
 
     def make_text_list(self, font, size, strings, color, start_y, y_space):
         rendered_text = []

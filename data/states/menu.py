@@ -9,9 +9,9 @@ class Menu(tools.States):
         self.screen_rect = screen_rect
         self.options = ["Play", "View Cards", "Quit"]
         self.next_list = ["GAME", "CARDVIEW"]
-        self.title, self.title_rect = self.make_text(
-            "Boom", self.title_color, (self.screen_rect.centerx, 75), 150
-        )
+        # self.title, self.title_rect = self.make_text(
+        #     "Boom", self.title_color, (self.screen_rect.centerx, 75), 150
+        # )
         self.title_logo = pg.image.load(
             "resources/graphics/bang_logo_bw.png"
         ).convert_alpha()
@@ -28,11 +28,6 @@ class Menu(tools.States):
                 self.change_selected_option(-1)
             elif event.key in [pg.K_DOWN, pg.K_s]:
                 self.change_selected_option(1)
-            elif event.key == self.keybinding["back"]:
-                self.button_sound.sound.play()
-                self.done = True
-                self.next = "MENU"
-
             elif event.key == pg.K_RETURN:
                 self.select_option(self.selected_index)
         elif event.type == self.background_music.track_end:
