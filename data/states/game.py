@@ -252,18 +252,19 @@ class Game(tools.States):
 
     def update_hand_position(self):
         move = []
+        # hand always centered
+        hand_width = (len(self.hand) + 1) * self.hand_card_bufferX
+        hand_x = self.screen_rect.centerx - hand_width / 2
         for i, card in enumerate(self.hand):
             card.rect.y = self.screen_rect.bottom - card.surf.get_height() * 1.05
             if card.selected:
                 card.rect.y -= self.hand_card_bufferY
                 move = self.hand[i+1:]
-            card.rect.x = i * self.hand_card_bufferX
+            card.rect.x = hand_x + i * self.hand_card_bufferX
 
-        # cards after selected move
+        # move cards after selected to right
         for i, c in enumerate(move):
-            c.rect.x = self.hand.index(move[i]) * self.hand_card_bufferX  + self.card_size[0] * 1.1 / 2
-
-            
+            c.rect.x = hand_x + self.hand.index(move[i]) * self.hand_card_bufferX  + self.card_size[0] * 1.1 / 2
 
     def fill_deck(self):
         """fill deck with playable cards only"""
