@@ -18,7 +18,6 @@ class Menu(tools.States):
         self.pre_render_options()
         self.from_bottom = 200
         self.spacer = 75
-        self.music_has_started = False
 
     def get_event(self, event, keys):
         if event.type == pg.QUIT:
@@ -79,6 +78,3 @@ class Menu(tools.States):
 
     def entry(self):
         pass
-        if not self.music_has_started:
-            pg.mixer.music.play()
-            self.music_has_started = True

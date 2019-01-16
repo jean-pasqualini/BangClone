@@ -184,7 +184,7 @@ class States:
         self.button_hover.sound.set_volume(self.button_hover_volume)
         self.cards_shuffle = Sound("cards_shuffle.wav")
         self.cards_shuffle.sound.set_volume(self.cards_shuffle_volume)
-        self.background_music_volume = 0.1
+        self.background_music_volume = 0.2
         self.background_music = Music(self.background_music_volume)
         self.bg_color = (25, 25, 25)
         self.timer = 0.0

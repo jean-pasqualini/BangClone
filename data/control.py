@@ -41,8 +41,8 @@ class Control:
         }
 
         self.state_name = "SPLASH"  # start game from Splash state
-        # self.state_name = 'MENU'
         self.state = self.state_dict[self.state_name]
+        pg.mixer.music.play()       # music from launch
 
     def event_loop(self):
         for event in pg.event.get():
