@@ -236,12 +236,13 @@ class Game(tools.States):
         screen.blit(sel.surf, self.overlay_card_position)
 
     def render_table_decks(self, screen):
-        screen.blit(
-            self.deck_thickness_card.surf,
-            (self.deck_thickness_card.rect.x, self.deck_thickness_card.rect.y),
-        )
+        if self.deck:
+            screen.blit(
+                self.deck_thickness_card.surf,
+                (self.deck_thickness_card.rect.x, self.deck_thickness_card.rect.y),
+            )
 
-        screen.blit(self.backend_card.surf, (self.play_deck_x, self.play_deck_y))
+            screen.blit(self.backend_card.surf, (self.play_deck_x, self.play_deck_y))
         if self.discard:
             screen.blit(self.discard[-1].surf, (self.play_deck_x + self.card_size[0] * 1.1, self.play_deck_y))
 
