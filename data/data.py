@@ -12,38 +12,40 @@ data = {
         "info": "Be the last one in play. You must kill the FBI agent after all the mobsters and police are dead.",
         "max": 1,
     },
-    # actions
+
+
+    # ACTIONS
     "panic": {
-        "info": "Draw a card from a player at distance 1. This distance is not modified by weapons, but by cards such as Vehicle and/or Scope.",
+        "info": "Draw a card from a player at distance 1. This distance is not modified by weapons, but by cards such as Mustang and/or Scope.",
         "max": 5,
         "action": "player",
     },
-    "store": {
+    "generalstore": {
         "info": "When played, as many cards as there are players still playing are turned face down on the table. Starting with the player that played it, proceeding clockwise, each player chooses one of the cards and adds it to their hand",
         "max": 3,
         "action": "all_players",
     },
-    "miss": {
-        "info": "May be played immediately to cancel the effect of a BOOM card, or any card with a BOOM symbol.",
+    "missed": {
+        "info": "May be played immediately to cancel the effect of a BANG card, or any card with a BANG symbol.",
         "max": 17,
         "action": "self",
     },
-    "pawn": {
+    "wellsfargo": {
         "info": "Draw 3 cards from the deck at time of play.",
         "max": 2,
         "action": "self",
     },
-    "shop": {
+    "stagecoach": {
         "info": "Draw 2 cards from the deck at time of play.",
         "max": 2,
         "action": "self",
     },
-    "boom": {
-        "info": "Deal a BOOM to target player. Target must play a MISS, otherwise the target loses one life point. Each player can only play one BOOM per turn.",
+    "bang": {
+        "info": "Deal a BANG to target player. Target must play a MISS, otherwise the target loses one life point. Each player can only play one BANG per turn.",
         "max": 29,
         "action": "player",
     },
-    "bar": {
+    "saloon": {
         "info": "One life point to every player.",
         "max": 2,
         "action": "all_players",
@@ -54,44 +56,34 @@ data = {
         "action": "self",
     },
     "duel": {
-        "info": "Target player must discard a BOOM card, then you, etc. First player failing to discard a BOOM card loses one life point. A MISS or KEG card is not accepted. This card does not use your turns BOOM.",
+        "info": "Target player must discard a BANG card, then you, etc. First player failing to discard a BANG card loses one life point. A MISS or KEG card is not accepted. This card does not use your turns BANG.",
         "max": 3,
         "action": "player",
     },
-    "raid": {
-        "info": "All other players discard a BOOM card or lose one life point. A MISS or KEG card is not accepted.",
+    "indians": {
+        "info": "All other players discard a BANG card or lose one life point. A MISS or BARREL card is not accepted.",
         "max": 3,
         "action": "all_players",
     },
-    "thief": {
+    "cat": {
         "info": "Force a player to discard a card. This card can be random from their hand, or a card they have on the table in play.",
         "max": 6,
         "action": "player",
     },
-    "tommygun": {
-        "info": "Deals a BOOM card to every other player regardless of distance. This card does not use your turns BOOM.",
+    "gatling": {
+        "info": "Deals a BANG card to every other player regardless of distance. This card does not use your turns BANG.",
         "max": 2,
         "action": "all_players",
     },
-    "whiskey": {
-        "info": "Discard this and a card of your choice from your hand and get two life points",
-        "max": 1,
-        "action": "self",
-    },
     # effects
-    "vehicle": {
-        "info": "When you have the vehicle in play, the distance at which other players see you is increased by one. However you still see the other players at normal distance.",
+    "mustang": {
+        "info": "When you have the mustang in play, the distance at which other players see you is increased by one. However you still see the other players at normal distance.",
         "max": 4,
         "action": "self_table",
     },
     "scope": {
         "info": "When you have the scope in play, you see all other players at a distance decreased by one. However, other players still see you at the normal distance. ",
-        "max": 1,
-        "action": "self_table",
-    },
-    "binoculars": {
-        "info": "When you have the binoculars in play, you see all other players at a distance decreased by one. However, other players still see you at the normal distance. ",
-        "max": 1,
+        "max": 2,
         "action": "self_table",
     },
     "dynamite": {
@@ -104,8 +96,33 @@ data = {
         "max": 3,
         "action": "player",
     },
-    "keg": {
+    "barrel": {
         "info": "Draw a heart and it acts as a MISS card played. Keg stays in play after.",
+        "max": 3,
+        "action": "self_table",
+    },
+    "remington": {
+        "info": "Shoot at distance 3.",
+        "max": 3,
+        "action": "self_table",
+    },
+    "rev.carabine": {
+        "info": "Shoot at distance 4.",
+        "max": 3,
+        "action": "self_table",
+    },
+    "schofield": {
+        "info": "Shoot at distance 2.",
+        "max": 3,
+        "action": "self_table",
+    },
+    "winchester": {
+        "info": "Shoot at distance 5.",
+        "max": 3,
+        "action": "self_table",
+    },
+    "volcanic": {
+        "info": "Shoot at distance 1 unlimited amount of times.",
         "max": 3,
         "action": "self_table",
     },

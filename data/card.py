@@ -6,7 +6,7 @@ class Card:
         if screen_rect:
             image_rect = image.get_rect()
             card_aspect_ratio = image_rect.width / image_rect.height
-            scale_factor = 3.5
+            scale_factor = 3.3
             card_size_scaled = (int((screen_rect.height / scale_factor) * card_aspect_ratio),
                                 int(screen_rect.height / scale_factor),
             )
