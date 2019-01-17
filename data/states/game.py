@@ -9,6 +9,7 @@ class Game(tools.States):
     def __init__(self, screen_rect):
         super().__init__()
         self.screen_rect = screen_rect
+        self.scaling_factor = int(screen_rect.width / 400)   # constant for better responsiveness
         self.overlay_bg = pg.Surface((screen_rect.width, screen_rect.height))
         self.overlay_bg.fill(0)
         self.overlay_bg.set_alpha(200)
@@ -16,8 +17,8 @@ class Game(tools.States):
         self.database = data.data
         self.deck = []  # only playable cards
         self.full_deck = []  # all cards
-        self.card_size = None
-        self.hand = []
+        self.card_size = None 
+        self.hand = []  # PLAYER
         self.create_full_deck()
         self.fill_deck()
         self.table = []
@@ -48,7 +49,9 @@ class Game(tools.States):
         self.is_hand_set = False
 
         self.help_btn_image = tools.Image.load("info.png")
-        # self.help_btn_image = pg.transform.scale(self.help_btn_image, (20,25))
+        self.help_btn_image = pg.transform.scale(self.help_btn_image, (25 * self.scaling_factor, 
+                                                                       25 * self.scaling_factor)
+        )
         self.help_btn_image_rect = self.help_btn_image.get_rect(topleft=(0, 0))
 
         self.settings = tools.Image.load("gear.png")
@@ -60,12 +63,15 @@ class Game(tools.States):
             "clicked_color": (255, 255, 255),
             "clicked_font_color": (0, 0, 0),
             "hover_font_color": (0, 0, 0),
-            "font": tools.Font.load("impact.ttf", 24),
+            "font": tools.Font.load("impact.ttf", 8 * self.scaling_factor),
             "font_color": (0, 0, 0),
             "call_on_release": True,
         }
+
+        self.play_button_width =  40 * self.scaling_factor
+        self.play_button_height = 15 * self.scaling_factor
         self.play_card_button = button.Button(
-            (25, 50, 175, 50),
+            (0, 0, self.play_button_width, self.play_button_height),
             (100, 200, 100),
             self.card_to_discard,
             text="Play Card",
@@ -203,7 +209,10 @@ class Game(tools.States):
     def reposition_play_btn(self):
         """place play button on top of the selected card"""
         self.play_card_button.rect.center = self.selected_card().rect.center
-        self.play_card_button.rect.y -= 200
+        self.play_card_button.rect.y -= (self.card_size[1] / 2 
+                                        + self.play_button_height/2 
+                                        + 2 * self.scaling_factor
+                                        )
 
     def render(self, screen):
         screen.blit(self.bg, self.bg_rect)

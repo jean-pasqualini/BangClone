@@ -8,7 +8,7 @@ class Splash(tools.States):
         self.text = ["Brought to you by", "metulburr & tarn"]
         self.screen_rect = screen_rect
         self.next = "MENU"
-        self.timeout = 10
+        self.timeout = 15
         self.start_time = 0
         self.cover = pg.Surface((screen_rect.width, screen_rect.height))
         self.cover.fill((255, 255, 255))
