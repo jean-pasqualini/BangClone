@@ -23,7 +23,7 @@ class Control:
         self.screensize = (int(size[0]), int(size[1]))
         if fullscreen:
             # set fullscreen mode with maximum possible resolution of screen
-            self.screen = pg.display.set_mode(self.monitor, pg.FULLSCREEN)
+            self.screen = pg.display.set_mode(self.screensize, pg.FULLSCREEN)
         else:
             os.environ["SDL_VIDEO_CENTERED"] = "True"
             self.screen = pg.display.set_mode(self.screensize)

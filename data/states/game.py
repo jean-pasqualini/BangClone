@@ -19,6 +19,7 @@ class Game(tools.States):
         self.full_deck = []  # all cards
         self.card_size = None 
         self.hand = []  # PLAYER
+        self.gun = None
         self.create_full_deck()
         self.fill_deck()
         self.table = []
@@ -77,12 +78,25 @@ class Game(tools.States):
             text="Play Card",
             **button_config,
         )
+        self.equip_gun_button = button.Button(
+            (0, 0, self.play_button_width, self.play_button_height),
+            (100, 200, 100),
+            self.equip_gun,
+            text="Equip gun",
+            **button_config,
+        )
 
-    def card_to_discard(self):
-        card = self.selected_card()
-        self.hand.remove(card)
+    def card_to_discard(self, card=None):
+        if not card:
+            card = self.selected_card()
+        if card in self.hand:
+            self.hand.remove(card)
+        elif card is self.gun:
+            self.discard.append(card)
         self.discard.append(card)
         self.button_sound.sound.play()
+        if self.gun:
+            print(tools.get_category(self.gun.path))
         print(f"cards in deck :{len(self.deck)}")
         print(f"cards in hand :{len(self.hand)}")
 
@@ -94,6 +108,7 @@ class Game(tools.States):
         if self.selected_card():
             if not self.help_overlay:
                 self.play_card_button.check_event(event)
+                self.equip_gun_button.check_event(event)
 
         if event.type == pg.QUIT:
             self.quit = True
@@ -206,20 +221,30 @@ class Game(tools.States):
                 0,
             )
 
-    def reposition_play_btn(self):
+    def reposition_card_buttons(self):
         """place play button on top of the selected card"""
         self.play_card_button.rect.center = self.selected_card().rect.center
         self.play_card_button.rect.y -= (self.card_size[1] / 2 
                                         + self.play_button_height/2 
                                         + 2 * self.scaling_factor
                                         )
+        self.equip_gun_button.rect.x = self.play_card_button.rect.right + 5
+        self.equip_gun_button.rect.y = self.play_card_button.rect.y
 
     def render(self, screen):
         screen.blit(self.bg, self.bg_rect)
         self.render_table_decks(screen)
         self.render_hand(screen)
+        self.render_gun(screen)
         if self.help_overlay:
             self.render_overlay(screen)
+
+    def render_gun(self, screen):
+        if self.gun:
+            screen.blit(self.gun.surf, (self.hand[-1].rect.right + 5 * self.scaling_factor, 
+                                        self.screen_rect.bottom - self.card_size[1] * 1.05)
+            )
+
 
     def render_hand(self, screen):
         c = None
@@ -233,8 +258,10 @@ class Game(tools.States):
 
         # render play button
         if self.selected_card():
-            self.reposition_play_btn()
+            self.reposition_card_buttons()
             self.play_card_button.render(screen)
+            if tools.get_category(self.selected_card().path) == "guns":
+                self.equip_gun_button.render(screen)
             screen.blit(self.help_btn_image, self.help_btn_image_rect)
 
     def render_overlay(self, screen):
@@ -300,6 +327,16 @@ class Game(tools.States):
                     for i in range(self.database[filename]["max"]):
                         self.full_deck.append(card.Card(path, image, self.screen_rect))
         self.card_size = self.full_deck[0].rect.size
+
+    def equip_gun(self, card=None):
+        """"""
+        if not card:
+            card = self.selected_card()
+        if self.gun:
+            self.card_to_discard(self.gun)
+        self.gun = card
+        self.hand.remove(card)
+        print(self.gun.path)
 
     def cleanup(self):
         pass  # pg.mixer.music.unpause()
