@@ -146,6 +146,8 @@ data = {
     # other (non playable cards)
     "backend": {"info": "Cards back side", "max": 0},
     "deck_thickness": {"info": "Card for offset thickness", "max": 0},
+    "gun_placeholder": {"info": "Card for offset thickness", "max": 0},
+    "card_placeholder": {"info": "Card for offset thickness", "max": 0},
 }
 
 if __name__ == "__main__":

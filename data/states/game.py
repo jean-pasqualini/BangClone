@@ -25,14 +25,16 @@ class Game(tools.States):
         self.table = []
         self.discard = []
         self.backend_path = os.path.join(tools.Image.path, "cards/other/backend.png")
-        self.thickness_path = os.path.join(
-            tools.Image.path, "cards/other/deck_thickness.png"
-        )
+        self.thickness_path = os.path.join(tools.Image.path, "cards/other/deck_thickness.png")
+        self.gun_placeholder_path = os.path.join(tools.Image.path, "cards/other/gun_placeholder.png")
         self.backend_card = card.Card(
             self.backend_path, pg.image.load(self.backend_path), self.screen_rect
         )
         self.deck_thickness_card = card.Card(
             self.thickness_path, pg.image.load(self.thickness_path), self.screen_rect
+        )
+        self.gun_placeholder_card = card.Card(
+            self.thickness_path, pg.image.load(self.gun_placeholder_path), self.screen_rect
         )
 
         self.bg_color = (255, 255, 255)
@@ -222,7 +224,7 @@ class Game(tools.States):
             )
 
     def reposition_card_buttons(self):
-        """place play button on top of the selected card"""
+        """place buttons on top of the selected card"""
         self.play_card_button.rect.center = self.selected_card().rect.center
         self.play_card_button.rect.y -= (self.card_size[1] / 2 
                                         + self.play_button_height/2 
@@ -234,16 +236,22 @@ class Game(tools.States):
     def render(self, screen):
         screen.blit(self.bg, self.bg_rect)
         self.render_table_decks(screen)
-        self.render_hand(screen)
         self.render_gun(screen)
+        self.render_hand(screen)
         if self.help_overlay:
             self.render_overlay(screen)
 
     def render_gun(self, screen):
-        if self.gun:
-            screen.blit(self.gun.surf, (self.hand[-1].rect.right + 5 * self.scaling_factor, 
-                                        self.screen_rect.bottom - self.card_size[1] * 1.05)
+        screen.blit(self.gun_placeholder_card.surf, 
+                    (self.screen_rect.width - self.card_size[0] - self.scaling_factor, 
+                     self.screen_rect.bottom - self.card_size[1] * 1.05)
             )
+        if self.gun:
+            screen.blit(self.gun.surf, 
+                        (self.screen_rect.width - self.card_size[0] - self.scaling_factor, 
+                         self.screen_rect.bottom - self.card_size[1] * 1.05)
+            )
+
 
 
     def render_hand(self, screen):
