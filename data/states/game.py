@@ -238,7 +238,7 @@ class Game(tools.States):
         self.render_table_decks(screen)
         self.render_gun(screen)
         self.render_hand(screen)
-        if self.help_overlay:
+        if self.help_overlay: 
             self.render_overlay(screen)
 
     def render_gun(self, screen):
@@ -360,3 +360,35 @@ class Game(tools.States):
         print(f"cards in hand :{len(self.hand)}")
         # pg.mixer.music.pause()
         # pg.mixer.music.play()
+
+
+class Player:
+    """Class responsible for storing player specific data,
+    transmitting actions to Game and receiving updates
+    """
+    def __init__(self, role, character):
+        super().__init__()
+        self.role = role
+        self.character = character
+        self.hand = None        
+        self.gun = None
+        self.active_cards = []
+        self.health = None
+        self.alive = True
+        self.buffs = []
+        self.curses = []
+
+    def draw_cards(self, card_num, game):
+        """remove drawn cards from deck and add in hand"""
+        picked_cards = random.sample(game.deck, card_num)
+        for card in picked_cards:
+            game.deck.remove(card)
+        return picked_cards
+
+
+    def equip_gun(self, card, game):
+        """game is an instance"""
+        if self.gun:
+            game.card_to_discard(self.gun)
+        self.gun = card
+        self.hand.remove(card)
