@@ -1,5 +1,5 @@
 import pygame as pg
-from .. import tools, card, data
+from .. import tools, card, data, player
 from ..GUI import button
 import os
 import random
@@ -88,29 +88,33 @@ class Game(tools.States):
             **button_config,
         )
 
+        self.player = player.Player("denis")
+        print(self.player.nickname)
+
+
     def card_to_discard(self, card=None):
         if not card:
-            card = self.selected_card()
-        if card in self.hand:
-            self.hand.remove(card)
-        elif card is self.gun:
+            card = self.player.selected_card()
+        if card in self.player.hand:
+            self.player.hand.remove(card)
+        elif card is self.player.gun:
             self.discard.append(card)
         self.discard.append(card)
         self.button_sound.sound.play()
-        if self.gun:
-            print(tools.get_category(self.gun.path))
+        if self.player.gun:
+            print(tools.get_category(self.player.gun.path))
         print(f"cards in deck :{len(self.deck)}")
-        print(f"cards in hand :{len(self.hand)}")
+        print(f"cards in hand :{len(self.player.hand)}")
 
 
     def card_to_table(self, card):
         pass
 
     def get_event(self, event, keys):
-        if self.selected_card():
+        if self.player.selected_card():
             if not self.help_overlay:
                 self.play_card_button.check_event(event)
-                if self.selected_card() and tools.get_category(self.selected_card().path) == "guns":
+                if self.player.selected_card() and tools.get_category(self.player.selected_card().path) == "guns":
                     self.equip_gun_button.check_event(event)
 
         if event.type == pg.QUIT:
@@ -137,7 +141,7 @@ class Game(tools.States):
             if not self.help_overlay:
                 self.select_deselect_card()
             if self.help_btn_image_rect.collidepoint(pg.mouse.get_pos()):
-                if self.selected_card():
+                if self.player.selected_card():
                     self.help_overlay = not self.help_overlay
 
     def select_deselect_card(self):
@@ -145,7 +149,7 @@ class Game(tools.States):
         selected and last card can be clicked everywhere,
         other cards can be selected only by left side of the card
         """
-        for card in self.hand:
+        for card in self.player.hand:
             half_width = int(card.rect.width / 2)
             card_left_side = card.rect.inflate(-half_width, 0)
             card_left_side.x -= int(half_width / 2)
@@ -156,16 +160,16 @@ class Game(tools.States):
                     self.button_sound.sound.play()
                     return card
 
-            elif card == self.hand[-1]:
+            elif card == self.player.hand[-1]:
                 if card.rect.collidepoint(pg.mouse.get_pos()):
-                    self.set_all_cards_select_to_false()
+                    self.player.set_all_cards_select_to_false()
                     card.selected = True
                     self.button_sound.sound.play()
                     return card
 
             else:
                 if card_left_side.collidepoint(pg.mouse.get_pos()):
-                    self.set_all_cards_select_to_false()
+                    self.player.set_all_cards_select_to_false()
                     card.selected = True
                     self.button_sound.sound.play()
                     return card
@@ -197,13 +201,13 @@ class Game(tools.States):
             self.update_table_decks_pisition()
 
             # TEMPORARY
-            if not self.hand and len(self.deck) >= 1:
+            if not self.player.hand and len(self.deck) >= 1:
                 if len(self.deck) < 4:
-                    self.hand = self.draw_cards(len(self.deck))
+                    self.player.hand = self.draw_cards(len(self.deck))
                 else:
-                    self.hand = self.draw_cards(4)
+                    self.player.hand = self.draw_cards(4)
         else:
-            filename = tools.get_filename(self.selected_card().path)
+            filename = tools.get_filename(self.player.selected_card().path)
             self.help_overlay_title, self.help_overlay_title_rect = self.make_text(
                 filename.title(),
                 (255, 255, 255),
@@ -226,7 +230,7 @@ class Game(tools.States):
 
     def reposition_card_buttons(self):
         """place buttons on top of the selected card"""
-        self.play_card_button.rect.center = self.selected_card().rect.center
+        self.play_card_button.rect.center = self.player.selected_card().rect.center
         self.play_card_button.rect.y -= (self.card_size[1] / 2 
                                         + self.play_button_height/2 
                                         + 2 * self.scaling_factor
@@ -247,8 +251,8 @@ class Game(tools.States):
                     (self.screen_rect.width - self.card_size[0] - self.scaling_factor, 
                      self.screen_rect.bottom - self.card_size[1] * 1.05)
             )
-        if self.gun:
-            screen.blit(self.gun.surf, 
+        if self.player.gun:
+            screen.blit(self.player.gun.surf, 
                         (self.screen_rect.width - self.card_size[0] - self.scaling_factor, 
                          self.screen_rect.bottom - self.card_size[1] * 1.05)
             )
@@ -257,7 +261,7 @@ class Game(tools.States):
 
     def render_hand(self, screen):
         c = None
-        for card in self.hand:
+        for card in self.player.hand:
             if card.selected:
                 c = card
             else:
@@ -266,10 +270,10 @@ class Game(tools.States):
             screen.blit(c.surf, (c.rect.x, c.rect.y))
 
         # render play button
-        if self.selected_card():
+        if self.player.selected_card():
             self.reposition_card_buttons()
             self.play_card_button.render(screen)
-            if tools.get_category(self.selected_card().path) == "guns":
+            if tools.get_category(self.player.selected_card().path) == "guns":
                 self.equip_gun_button.render(screen)
             screen.blit(self.help_btn_image, self.help_btn_image_rect)
 
@@ -277,7 +281,7 @@ class Game(tools.States):
         screen.blit(self.overlay_bg, (0, 0))
         screen.blit(self.help_overlay_title, self.help_overlay_title_rect)
         screen.blit(self.help_overlay_text, self.help_overlay_text_rect)
-        sel = self.selected_card()
+        sel = self.player.selected_card()
         screen.blit(sel.surf, self.overlay_card_position)
 
     def render_table_decks(self, screen):
@@ -298,18 +302,18 @@ class Game(tools.States):
     def update_hand_position(self):
         move = []
         # hand always centered
-        hand_width = (len(self.hand) + 1) * self.hand_card_bufferX
+        hand_width = (len(self.player.hand) + 1) * self.hand_card_bufferX
         hand_x = self.screen_rect.centerx - hand_width / 2
-        for i, card in enumerate(self.hand):
+        for i, card in enumerate(self.player.hand):
             card.rect.y = self.screen_rect.bottom - card.surf.get_height() * 1.05
             if card.selected:
                 card.rect.y -= self.hand_card_bufferY
-                move = self.hand[i+1:]
+                move = self.player.hand[i+1:]
             card.rect.x = hand_x + i * self.hand_card_bufferX
 
         # move cards after selected to right
         for i, c in enumerate(move):
-            c.rect.x = hand_x + self.hand.index(move[i]) * self.hand_card_bufferX  + self.card_size[0] * 1.1 / 2
+            c.rect.x = hand_x + self.player.hand.index(move[i]) * self.hand_card_bufferX  + self.card_size[0] * 1.1 / 2
 
     def fill_deck(self):
         """fill deck with playable cards only"""
@@ -340,12 +344,12 @@ class Game(tools.States):
     def equip_gun(self, card=None):
         """"""
         if not card:
-            card = self.selected_card()
-        if self.gun:
-            self.card_to_discard(self.gun)
-        self.gun = card
-        self.hand.remove(card)
-        print(self.gun.path)
+            card = self.player.selected_card()
+        if self.player.gun:
+            self.card_to_discard(self.player.gun)
+        self.player.gun = card
+        self.player.hand.remove(card)
+        print(self.player.gun.path)
 
     def cleanup(self):
         pass  # pg.mixer.music.unpause()
@@ -353,43 +357,11 @@ class Game(tools.States):
         # self.background_music.setup(self.background_music_volume)
 
     def entry(self):
-        if not self.is_hand_set:
-            self.is_hand_set = True
+        if not self.player.is_hand_set:
+            self.player.is_hand_set = True
             # TEMPORARY
-            self.hand = self.draw_cards(7)
+            self.player.hand = self.draw_cards(7)
         print(f"cards in deck :{len(self.deck)}")
-        print(f"cards in hand :{len(self.hand)}")
+        print(f"cards in hand :{len(self.player.hand)}")
         # pg.mixer.music.pause()
         # pg.mixer.music.play()
-
-
-class Player:
-    """Class responsible for storing player specific data,
-    transmitting actions to Game and receiving updates
-    """
-    def __init__(self, role, character):
-        super().__init__()
-        self.role = role
-        self.character = character
-        self.hand = None        
-        self.gun = None
-        self.active_cards = []
-        self.health = None
-        self.alive = True
-        self.buffs = []
-        self.curses = []
-
-    def draw_cards(self, card_num, game):
-        """remove drawn cards from deck and add in hand"""
-        picked_cards = random.sample(game.deck, card_num)
-        for card in picked_cards:
-            game.deck.remove(card)
-        return picked_cards
-
-
-    def equip_gun(self, card, game):
-        """game is an instance"""
-        if self.gun:
-            game.card_to_discard(self.gun)
-        self.gun = card
-        self.hand.remove(card)
