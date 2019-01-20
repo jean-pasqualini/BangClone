@@ -1,9 +1,10 @@
 import pygame as pg
 from .. import tools
 import random
+from . import states
 
 
-class Menu(tools.States):
+class Menu(states.States):
     def __init__(self, screen_rect):
         super().__init__()
         self.screen_rect = screen_rect

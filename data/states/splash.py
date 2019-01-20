@@ -1,8 +1,9 @@
 import pygame as pg
 from .. import tools
+from . import states
 
 
-class Splash(tools.States):
+class Splash(states.States):
     def __init__(self, screen_rect):
         super().__init__()
         self.text = ["Brought to you by", "metulburr & tarn"]

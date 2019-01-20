@@ -1,24 +1,28 @@
+import os
+import random
 import pygame as pg
 from .. import tools, card, data, player
 from ..GUI import button
-import os
-import random
+from . import states
 
 
-class Game(tools.States):
+class Game(states.States):
+    """For now(!): Create screen, 
+    update both Player and Game, render gathered data
+    """
     def __init__(self, screen_rect):
         super().__init__()
         self.screen_rect = screen_rect
-        self.scaling_factor = int(screen_rect.width / 400)   # constant for better responsiveness
+        self.scaling_factor = int(screen_rect.width / 400)
         self.overlay_bg = pg.Surface((screen_rect.width, screen_rect.height))
         self.overlay_bg.fill(0)
         self.overlay_bg.set_alpha(200)
         self.overlay_card_position = (100, 200)
         self.database = data.data
-        self.deck = []  # only playable cards
-        self.full_deck = []  # all cards
-        self.card_size = None 
+        self.full_deck = []
         self.create_full_deck()
+        self.card_size = self.full_deck[0].rect.size
+        self.deck = []  # only playable cards
         self.fill_deck()
         self.table = []
         self.discard = []
@@ -80,32 +84,40 @@ class Game(tools.States):
         self.equip_gun_button = button.Button(
             (0, 0, self.play_button_width, self.play_button_height),
             (100, 200, 100),
-            self.equip_gun,
+            self.player_equip_gun,
             text="Equip gun",
             **button_config,
         )
-
-        self.player = player.Player("denis")
-        print(self.player.nickname)
-
+        self.player = player.Player("Tarn")
+        print(f"player: {self.player.nickname}")
 
     def card_to_discard(self, card=None):
         if not card:
             card = self.player.selected_card()
         if card in self.player.hand:
             self.player.hand.remove(card)
+        elif card in self.player.buffs:
+            self.player.buffs.remove(card)
         elif card is self.player.gun:
             self.discard.append(card)
         self.discard.append(card)
         self.button_sound.sound.play()
-        if self.player.gun:
-            print(tools.get_category(self.player.gun.path))
-        print(f"cards in deck :{len(self.deck)}")
-        print(f"cards in hand :{len(self.player.hand)}")
 
+    ### SOME OF THESE WILL CALL SIMIAL PLAYER METHODS 
 
     def card_to_table(self, card):
         pass
+
+    def card_to_target(self, card, target):
+        pass
+
+    def card_to_all(self, card):
+        pass
+
+    def player_equip_buff(self, card):
+        pass
+
+    #################################################
 
     def get_event(self, event, keys):
         if self.player.selected_card():
@@ -136,15 +148,15 @@ class Game(tools.States):
 
         elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
             if not self.help_overlay:
-                self.select_deselect_card()
+                self.check_select_deselect_card()
             if self.help_btn_image_rect.collidepoint(pg.mouse.get_pos()):
                 if self.player.selected_card():
                     self.help_overlay = not self.help_overlay
 
-    def select_deselect_card(self):
-        """Select or deselect cards
-        selected and last card can be clicked everywhere,
-        other cards can be selected only by left side of the card
+    def check_select_deselect_card(self):
+        """Check if card was selected/deselected. 
+        If card is fully visible (the last one or/and selected) 
+        it can be selected everywhere, otherwise only on left side of card.
         """
         for card in self.player.hand:
             half_width = int(card.rect.width / 2)
@@ -170,21 +182,6 @@ class Game(tools.States):
                     card.selected = True
                     self.button_sound.sound.play()
                     return card
-
-    def set_all_cards_select_to_false(self):
-        for card in self.hand:
-            card.selected = False
-
-    def selected_card(self):
-        for card in self.hand:
-            if card.selected:
-                return card
-
-    def hand_selected(self):
-        c = []
-        for card in self.hand:
-            c.append(card.selected)
-        return c
 
     def same_bool(self, lister):
         """Return true only if all items in lister are true 
@@ -254,8 +251,6 @@ class Game(tools.States):
                          self.screen_rect.bottom - self.card_size[1] * 1.05)
             )
 
-
-
     def render_hand(self, screen):
         c = None
         for card in self.player.hand:
@@ -265,8 +260,9 @@ class Game(tools.States):
                 screen.blit(card.surf, (card.rect.x, card.rect.y))
         if c:
             screen.blit(c.surf, (c.rect.x, c.rect.y))
+        self.render_play_buttons(screen)
 
-        # render play button
+    def render_play_buttons(self, screen):
         if self.player.selected_card():
             self.reposition_card_buttons()
             self.play_card_button.render(screen)
@@ -297,8 +293,10 @@ class Game(tools.States):
         self.deck_thickness_card.rect.x = self.play_deck_x - (0.2 * len(self.deck))
 
     def update_hand_position(self):
+        """Center hand in the middle of the screen,
+        shift all cards after selected to make it fully visible.
+        """
         move = []
-        # hand always centered
         hand_width = (len(self.player.hand) + 1) * self.hand_card_bufferX
         hand_x = self.screen_rect.centerx - hand_width / 2
         for i, card in enumerate(self.player.hand):
@@ -307,26 +305,24 @@ class Game(tools.States):
                 card.rect.y -= self.hand_card_bufferY
                 move = self.player.hand[i+1:]
             card.rect.x = hand_x + i * self.hand_card_bufferX
-
-        # move cards after selected to right
         for i, c in enumerate(move):
             c.rect.x = hand_x + self.player.hand.index(move[i]) * self.hand_card_bufferX  + self.card_size[0] * 1.1 / 2
 
     def fill_deck(self):
-        """fill deck with playable cards only"""
+        """Fill deck with playable cards only"""
         for card in self.full_deck:
             if tools.get_category(card.path) not in ["roles", "characters", "other"]:
                 self.deck.append(card)
 
     def draw_cards(self, card_num):
-        """remove drawn cards from deck and add in hand"""
+        """Return randomly removed cards from deck"""
         picked_cards = random.sample(self.deck, card_num)
         for card in picked_cards:
             self.deck.remove(card)
         return picked_cards
 
     def create_full_deck(self):
-        """Create deck from all cards from the game"""
+        """Create full deck from all possible cards in data dict"""
         path = os.path.join(tools.Image.path, "cards")
         for root, dirs, files in os.walk(path):
             for f in files:
@@ -336,29 +332,26 @@ class Game(tools.States):
                     filename = tools.get_filename(path)
                     for i in range(self.database[filename]["max"]):
                         self.full_deck.append(card.Card(path, image, self.screen_rect))
-        self.card_size = self.full_deck[0].rect.size
 
-    def equip_gun(self, card=None):
-        """"""
-        if not card:
-            card = self.player.selected_card()
-        if self.player.gun:
-            self.card_to_discard(self.player.gun)
-        self.player.gun = card
-        self.player.hand.remove(card)
-        print(self.player.gun.path)
+    def player_equip_gun(self):
+        card = self.player.equip_gun()
+        if card:
+            self.discard.append(card)
+        self.button_sound.sound.play()
 
     def cleanup(self):
-        pass  # pg.mixer.music.unpause()
-        # pg.mixer.music.stop()
-        # self.background_music.setup(self.background_music_volume)
+        pass
 
     def entry(self):
         if not self.player.is_hand_set:
             self.player.is_hand_set = True
             # TEMPORARY
             self.player.hand = self.draw_cards(7)
-        print(f"cards in deck :{len(self.deck)}")
-        print(f"cards in hand :{len(self.player.hand)}")
-        # pg.mixer.music.pause()
-        # pg.mixer.music.play()
+
+class GameUpdate():
+    """TODO"""
+    pass
+
+class GameRender():
+    """TODO"""
+    pass

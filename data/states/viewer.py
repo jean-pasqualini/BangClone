@@ -3,9 +3,10 @@ from .. import tools, data
 from ..GUI import button
 import os
 from ..card import Card  # States.set_cards()
+from . import states
 
 
-class Viewer(tools.States):
+class Viewer(states.States):
     def __init__(self, screen_rect):
         super().__init__()
         self.screen_rect = screen_rect

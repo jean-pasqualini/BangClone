@@ -7,7 +7,7 @@ if __name__ == "__main__":
 class Button(object):
     """A fairly straight forward button class."""
 
-    def __init__(self, rect, color, function, card=None, **kwargs):
+    def __init__(self, rect, color, function, **kwargs):
         self.rect = pg.Rect(rect)
         self.color = color
         self.function = function

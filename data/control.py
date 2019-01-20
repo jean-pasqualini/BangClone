@@ -5,24 +5,17 @@ from . import tools
 
 
 class Control:
+    """Setup a pygame environment, handle events, 
+    control flow of app states, set main loop 
     """
-    game controller class:
-    - parses input parameters
-    - sets screen, clock, event handler, state changer, and main game loop
-    """
-
     def __init__(self, fullscreen, difficulty, size):
+        # self.monitor = (pg.display.Info().current_w, pg.display.Info().current_h)
         pg.mixer.pre_init(44100, -16, 1, 512)
         pg.init()
-        self.monitor = (pg.display.Info().current_w, pg.display.Info().current_h)
         pg.display.set_caption("Boom")
-
-        self.icon = tools.Image.load("ai.png")  # favicon
-        pg.display.set_icon(self.icon)
-
+        pg.display.set_icon(tools.Image.load("ai.png"))
         self.screensize = (int(size[0]), int(size[1]))
         if fullscreen:
-            # set fullscreen mode with maximum possible resolution of screen
             self.screen = pg.display.set_mode(self.screensize, pg.FULLSCREEN)
         else:
             os.environ["SDL_VIDEO_CENTERED"] = "True"
@@ -37,10 +30,8 @@ class Control:
             "SPLASH": splash.Splash(self.screen_rect),
             "CARDVIEW": viewer.Viewer(self.screen_rect),
             "GAME": game.Game(self.screen_rect),
-            #'OVERLAY' : overlay.Overlay(self.screen_rect),
         }
-
-        self.state_name = "SPLASH"  # start game from Splash state
+        self.state_name = "SPLASH"
         self.state = self.state_dict[self.state_name]
         pg.mixer.music.play()       # music from launch
 
@@ -61,7 +52,7 @@ class Control:
             self.state.entry()
 
     def run(self):
-        """main game loop"""
+        """Main game loop"""
         while not self.done:
             if self.state.quit:
                 self.done = True

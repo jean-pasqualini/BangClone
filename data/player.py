@@ -19,10 +19,18 @@ class Player:
     def selected_card(self):
         for card in self.hand:
             if card.selected:
-                print(card)
                 return card
 
     def set_all_cards_select_to_false(self):
         for card in self.hand:
             card.selected = False
 
+    def equip_gun(self):
+        """Equip gun from selected card, return old gun or None"""
+        old_card = None
+        card = self.selected_card()
+        if self.gun:
+            old_card = self.gun
+        self.gun = card
+        self.hand.remove(card)
+        return old_card
