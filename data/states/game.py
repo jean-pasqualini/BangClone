@@ -18,8 +18,6 @@ class Game(tools.States):
         self.deck = []  # only playable cards
         self.full_deck = []  # all cards
         self.card_size = None 
-        self.hand = []  # PLAYER
-        self.gun = None
         self.create_full_deck()
         self.fill_deck()
         self.table = []
@@ -49,7 +47,6 @@ class Game(tools.States):
         self.hand_card_bufferY = 25
         self.bg = tools.Image.load("greenbg.png")
         self.bg_rect = self.bg.get_rect()
-        self.is_hand_set = False
 
         self.help_btn_image = tools.Image.load("info.png")
         self.help_btn_image = pg.transform.scale(self.help_btn_image, (25 * self.scaling_factor, 
