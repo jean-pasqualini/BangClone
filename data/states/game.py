@@ -110,7 +110,8 @@ class Game(tools.States):
         if self.selected_card():
             if not self.help_overlay:
                 self.play_card_button.check_event(event)
-                self.equip_gun_button.check_event(event)
+                if self.selected_card() and tools.get_category(self.selected_card().path) == "guns":
+                    self.equip_gun_button.check_event(event)
 
         if event.type == pg.QUIT:
             self.quit = True
