@@ -31,13 +31,7 @@ class Menu(states.States):
             elif event.key == pg.K_RETURN:
                 self.select_option(self.selected_index)
         elif event.type == self.background_music.track_end:
-            self.background_music.track = (self.background_music.track + 1) % len(
-                self.background_music.tracks
-            )
-            pg.mixer.music.load(
-                self.background_music.tracks[self.background_music.track]
-            )
-            pg.mixer.music.play()
+            self.play_next_track()
         self.mouse_menu_click(event)
 
     def update(self, now, keys):

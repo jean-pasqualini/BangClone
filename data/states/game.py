@@ -139,13 +139,7 @@ class Game(states.States):
                     self.help_overlay = not self.help_overlay
 
         elif event.type == self.background_music.track_end:
-            self.background_music.track = (self.background_music.track + 1) % len(
-                self.background_music.tracks
-            )
-            pg.mixer.music.load(
-                self.background_music.tracks[self.background_music.track]
-            )
-            pg.mixer.music.play()
+            self.play_next_track()
 
         elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
             if not self.help_overlay:

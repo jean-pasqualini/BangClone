@@ -111,15 +111,8 @@ class Viewer(states.States):
                 self.button_sound.sound.play()
                 self.done = True
                 self.next = "MENU"
-
         elif event.type == self.background_music.track_end:
-            self.background_music.track = (self.background_music.track + 1) % len(
-                self.background_music.tracks
-            )
-            pg.mixer.music.load(
-                self.background_music.tracks[self.background_music.track]
-            )
-            pg.mixer.music.play()
+            self.play_next_track()
         self.mouse_menu_click(event)
         self.next_button.check_event(event)
         self.prev_button.check_event(event)

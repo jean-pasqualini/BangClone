@@ -104,6 +104,8 @@ class Splash(states.States):
             self.quit = True
         elif event.type == pg.KEYDOWN:
             self.done = True
+        elif event.type == self.background_music.track_end:
+            self.play_next_track()
 
     def cleanup(self):
         pass

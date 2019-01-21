@@ -111,3 +111,10 @@ class States:
             elif self.selected_index > max_ind:
                 self.selected_index = 0
             self.button_hover.sound.play()
+
+    def play_next_track(self):
+        self.background_music.track = (self.background_music.track + 1) % len(
+                self.background_music.tracks)
+        pg.mixer.music.load(
+                self.background_music.tracks[self.background_music.track])
+        pg.mixer.music.play()
