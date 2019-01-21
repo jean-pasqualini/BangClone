@@ -120,10 +120,11 @@ class Game(states.States):
     #################################################
 
     def get_event(self, event, keys):
-        if self.player.selected_card():
-            if not self.help_overlay:
+        if not self.help_overlay:
+            if self.player.selected_card():
+                selected_card = self.player.selected_card()
                 self.play_card_button.check_event(event)
-                if self.player.selected_card() and tools.get_category(self.player.selected_card().path) == "guns":
+                if tools.get_category(selected_card.path) == "guns":
                     self.equip_gun_button.check_event(event)
 
         if event.type == pg.QUIT:
