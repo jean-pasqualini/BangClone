@@ -11,12 +11,12 @@ TODO List
 * add card flip, card drop sounds
 
 ## code
+* Make other's cards and decks smaller to fit everything else
 * GUI
 	* healthbar
 	* role & char
 	* 
 * different cards usage class representation
-* responsive play buttons(s)
 * make responsive card viewer 
 * different table background and player positions for 4-7 players
 * fixed maximum length of hand, and maximum gap between cards (!)
@@ -34,6 +34,7 @@ TODO List
 * add music option on/off
 * add more content to background of main menu than just a blank fill screen
 * add self updater
+* ~~responsive play buttons(s)~~
 * ~~modify cards, deck, and players size to fit in screen~~
 * ~~adjust splashscreen to fit any size window~~
 * ~~display table on board~~
