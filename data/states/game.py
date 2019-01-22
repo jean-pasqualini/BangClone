@@ -202,6 +202,7 @@ class Game(states.States):
         if not self.help_overlay:
             self.update_hand_position()
             self.update_table_decks_pisition()
+            self.update_buffs_position()
 
             # TEMPORARY
             if not self.player.hand and len(self.deck) >= 1:
@@ -247,6 +248,7 @@ class Game(states.States):
         screen.blit(self.bg, self.bg_rect)
         self.render_table_decks(screen)
         self.render_gun(screen)
+        self.render_buffs(screen)
         self.render_hand(screen)
         if self.help_overlay: 
             self.render_overlay(screen)
@@ -273,7 +275,17 @@ class Game(states.States):
             screen.blit(c.surf, (c.rect.x, c.rect.y))
         self.render_play_buttons(screen)
 
+    def render_buffs(self, screen):
+        for card in self.player.buffs:
+            screen.blit(card.surf, (card.rect.x, card.rect.y))
+
+
     def render_play_buttons(self, screen):
+        """Render play buttons on top of the selected card.
+        Equip gun button for guns
+        Equip buff button for buffs which are not applied already
+        Play Card for all cards (TEMPORARY)
+        """
         if self.player.selected_card():
             self.reposition_card_buttons()
             self.play_card_button.render(screen)
@@ -324,6 +336,13 @@ class Game(states.States):
             card.rect.x = hand_x + i * self.hand_card_bufferX
         for i, c in enumerate(move):
             c.rect.x = hand_x + self.player.hand.index(move[i]) * self.hand_card_bufferX  + self.card_size[0] * 1.1 / 2
+
+    def update_buffs_position(self):
+        buffs_width = (len(self.player.hand) + 1) * self.hand_card_bufferX
+        buffs_x = self.screen_rect.centerx - buffs_width / 2
+        for i, card in enumerate(self.player.buffs):
+            card.rect.y = self.screen_rect.bottom - card.surf.get_height() * 1.25
+            card.rect.x = buffs_x + i * self.hand_card_bufferX
 
     def fill_deck(self):
         """Fill deck with playable cards only"""
