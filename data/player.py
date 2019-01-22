@@ -21,7 +21,7 @@ class Player:
         self.alive = True
         self.buffs = []
         self.curses = []
-        Player.objects.append(self.id)
+        Player.objects.append(self)
         print(f"Player name: {self.nickname}, player id: {self.id} joined game")
 
 
@@ -52,3 +52,9 @@ class Player:
         while id in Player.objects:
             self.randomize_id()
         return id
+
+    @classmethod
+    def get_players(cls):
+        """Return all availible player objects"""
+        ids = [obj for obj in cls.objects]
+        return ids
