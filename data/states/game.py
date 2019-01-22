@@ -88,6 +88,13 @@ class Game(states.States):
             text="Equip gun",
             **button_config,
         )
+        self.equip_buff_button = button.Button(
+            (0, 0, self.play_button_width, self.play_button_height),
+            (100, 200, 100),
+            self.player_equip_buff,
+            text="Equip buff",
+            **button_config,
+        )
         self.player = player.Player("Tarn")
 
         #############TEMPORARY#############
@@ -118,9 +125,6 @@ class Game(states.States):
     def card_to_all(self, card):
         pass
 
-    def player_equip_buff(self, card):
-        pass
-
     #################################################
 
     def get_event(self, event, keys):
@@ -130,6 +134,12 @@ class Game(states.States):
                 self.play_card_button.check_event(event)
                 if tools.get_category(selected_card.path) == "guns":
                     self.equip_gun_button.check_event(event)
+                elif tools.get_category(selected_card.path) == "buffs":
+                    buff_names = []
+                    for buff in self.player.buffs:
+                        buff_names.append(tools.get_filename(buff.path))
+                    if tools.get_filename(selected_card.path) not in buff_names:
+                        self.equip_buff_button.check_event(event)
 
         if event.type == pg.QUIT:
             self.quit = True
@@ -230,6 +240,8 @@ class Game(states.States):
                                         )
         self.equip_gun_button.rect.x = self.play_card_button.rect.right + 5
         self.equip_gun_button.rect.y = self.play_card_button.rect.y
+        self.equip_buff_button.rect.x = self.play_card_button.rect.right + 5
+        self.equip_buff_button.rect.y = self.play_card_button.rect.y
 
     def render(self, screen):
         screen.blit(self.bg, self.bg_rect)
@@ -267,6 +279,12 @@ class Game(states.States):
             self.play_card_button.render(screen)
             if tools.get_category(self.player.selected_card().path) == "guns":
                 self.equip_gun_button.render(screen)
+            elif tools.get_category(self.player.selected_card().path) == "buffs":
+                buff_names = []
+                for buff in self.player.buffs:
+                    buff_names.append(tools.get_filename(buff.path))
+                if tools.get_filename(self.player.selected_card().path) not in buff_names:
+                    self.equip_buff_button.render(screen)
             screen.blit(self.help_btn_image, self.help_btn_image_rect)
 
     def render_overlay(self, screen):
@@ -333,9 +351,14 @@ class Game(states.States):
                         self.full_deck.append(card.Card(path, image, self.screen_rect))
 
     def player_equip_gun(self):
+        """Player equip gun, discard previous gun"""
         card = self.player.equip_gun()
         if card:
             self.discard.append(card)
+        self.button_sound.sound.play()
+
+    def player_equip_buff(self):
+        self.player.equip_buff()
         self.button_sound.sound.play()
 
     def cleanup(self):

@@ -1,6 +1,6 @@
 import random
 import string
-
+from . import tools
 
 class Player:
     """Class responsible for storing player specific data,
@@ -45,6 +45,16 @@ class Player:
         self.gun = card
         self.hand.remove(card)
         return old_card
+
+    def equip_buff(self, card=None):
+        """Equip buff card
+        """
+        if not card:
+            card = self.selected_card()
+        self.buffs.append(card)
+        self.hand.remove(card)
+        for buff in self.buffs:
+            print(tools.get_filename(buff.path))
 
     def randomize_id(self):
         """Return unique and random string as player's id."""

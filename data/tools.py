@@ -28,7 +28,6 @@ def get_filename(path):
     """get filename from image fullpath of card"""
     return os.path.split(os.path.splitext(path)[0])[1]
 
-
 class TextRectException:
     def __init__(self, message=None):
         self.message = message
