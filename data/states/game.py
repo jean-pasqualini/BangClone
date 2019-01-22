@@ -89,7 +89,13 @@ class Game(states.States):
             **button_config,
         )
         self.player = player.Player("Tarn")
-        print(f"player: {self.player.nickname}")
+
+
+        #############TEMPORARY#############
+        self.player1 = player.Player("Bot1")
+        self.player2 = player.Player("Bot2")
+        #############TEMPORARY#############
+        
 
     def card_to_discard(self, card=None):
         if not card:
