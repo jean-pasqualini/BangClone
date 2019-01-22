@@ -48,13 +48,14 @@ class Player:
 
     def randomize_id(self):
         """Return unique and random string as player's id."""
-        id = ''.join(random.choices(string.ascii_lowercase + string.digits + string.punctuation, k=20))
+        id = ''.join(random.choices(string.ascii_lowercase + string.digits, k=30))
         while id in Player.objects:
             self.randomize_id()
         return id
 
     @classmethod
-    def get_players(cls):
+    def get_player_by_id(cls, id):
         """Return all availible player objects"""
-        ids = [obj for obj in cls.objects]
-        return ids
+        for obj in cls.objects:
+            if obj.id == id:
+                return obj

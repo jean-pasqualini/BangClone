@@ -90,13 +90,10 @@ class Game(states.States):
         )
         self.player = player.Player("Tarn")
 
-
         #############TEMPORARY#############
         self.player1 = player.Player("Bot1")
         self.player2 = player.Player("Bot2")
         #############TEMPORARY#############
-        print(player.Player.get_players())
-
 
     def card_to_discard(self, card=None):
         if not card:
