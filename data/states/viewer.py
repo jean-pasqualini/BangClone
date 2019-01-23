@@ -10,18 +10,17 @@ class Viewer(states.States):
     def __init__(self, screen_rect):
         super().__init__()
         self.screen_rect = screen_rect
+        self.scaling_factor = int(self.screen_rect.width / 400)
         self.options = ["Back"]
         self.next_list = ["MENU"]
         self.title, self.title_rect = self.make_text(
             "Card Viewer", self.title_color, (self.screen_rect.centerx, 75), 150
         )
-
         self.pre_render_options(self.screen_rect.width)
         self.from_bottom = 550
         self.spacer = 75
-        self.card_offsetY = 55
-
         self.create_deck()
+        self.card_size = self.cards[0].rect.size
         self.update_image(0)
         self.database = data.data
 
@@ -32,15 +31,25 @@ class Viewer(states.States):
             "hover_font_color": (0, 0, 0),
             "font": tools.Font.load("impact.ttf", 12),
         }
+        self.play_button_width =  40 * self.scaling_factor
+        self.play_button_height = 15 * self.scaling_factor
         self.next_button = button.Button(
-            (475, 150, 100, 25),
+            (self.screen_rect.left + 50 * self.scaling_factor, 
+             self.screen_rect.centery - self.play_button_height / 2, 
+             self.play_button_width, 
+             self.play_button_height
+            ),
             (100, 100, 100),
             lambda x=1: self.switch_card(x),
             text="Next",
             **button_config
         )
         self.prev_button = button.Button(
-            (225, 150, 100, 25),
+            (self.screen_rect.right - 50 * self.scaling_factor - self.play_button_width, 
+             self.screen_rect.centery - self.play_button_height / 2,
+             self.play_button_width, 
+             self.play_button_height
+            ),
             (100, 100, 100),
             lambda x=-1: self.switch_card(x),
             text="Previous",
@@ -75,8 +84,8 @@ class Viewer(states.States):
     def update_image(self, val):
         self.image = self.cards[val].surf
         self.image_rect = self.image.get_rect(
-            centerx=self.screen_rect.centerx - 125,
-            centery=self.screen_rect.centery + self.card_offsetY,
+            centerx=self.screen_rect.centerx - self.card_size[0] / 2,
+            centery=self.screen_rect.centery + 50,
         )
         self.path = self.cards[val].path
         category = tools.get_category(self.path)
@@ -129,13 +138,18 @@ class Viewer(states.States):
             filename.title(),
             (255, 255, 255),
             (self.screen_rect.centerx, 100),
-            60,
+            60 * self.scaling_factor,
             fonttype="impact.ttf",
         )
 
         string = self.database[filename]["info"]
-        my_font = tools.Font.load("impact.ttf", 20)
-        self.help_overlay_text_rect = pg.Rect((425, 200, 300, 300))
+        my_font = tools.Font.load("impact.ttf", 8 * self.scaling_factor)
+        self.help_overlay_text_rect = pg.Rect((self.screen_rect.centerx + self.screen_rect.width / 16, 
+                                               self.screen_rect.centery - self.card_size[1] / 2 + 50, 
+                                               150 * self.scaling_factor, 
+                                               200 * self.scaling_factor
+                                               )
+                                             )
         self.help_overlay_text = tools.render_textrect(
             string,
             my_font,
@@ -155,7 +169,7 @@ class Viewer(states.States):
         for i, opt in enumerate(self.rendered["des"]):
             opt[1].center = (
                 self.screen_rect.centerx,
-                self.from_bottom + i * self.spacer,
+                self.screen_rect.height - self.scaling_factor * 20 + i * self.spacer,
             )
             if i == self.selected_index:
                 rend_img, rend_rect = self.rendered["sel"][i]

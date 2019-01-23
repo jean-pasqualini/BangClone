@@ -64,7 +64,7 @@ class States:
                     self.select_option(i)
                     break
 
-    def make_text(self, message, color, center, size, fonttype="godfather.ttf"):
+    def make_text(self, message, color, center, size, fonttype="impact.ttf"):
         font = tools.Font.load(fonttype, size)
         text = font.render(message, True, color)
         rect = text.get_rect(center=center)

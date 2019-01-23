@@ -38,7 +38,6 @@ class Game(states.States):
         self.gun_placeholder_card = card.Card(
             self.thickness_path, pg.image.load(self.gun_placeholder_path), self.screen_rect
         )
-
         self.bg_color = (255, 255, 255)
         self.help_overlay = False
         self.hand_card_bufferX = self.card_size[0] / 2
@@ -46,7 +45,7 @@ class Game(states.States):
         # x and y to place deck in the middle of the screen (a bit left)
         self.play_deck_x = self.screen_rect.centerx - self.card_size[0]
         self.play_deck_y = self.screen_rect.centery - self.card_size[1] / 2
-        self.hand_card_bufferY = 25
+        self.hand_card_bufferY = 10 * self.scaling_factor
         self.bg = tools.Image.load("greenbg.png")
         self.bg_rect = self.bg.get_rect()
 
