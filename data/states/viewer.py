@@ -48,7 +48,7 @@ class Viewer(states.States):
         )
 
     def create_deck(self):
-        """create deck of all unique cards"""
+        """Dill deck with all cards, except 'other' category"""
         self.cards = []
         path = os.path.join(tools.Image.path, "cards")
         for root, dirs, files in os.walk(path):

@@ -2,6 +2,7 @@ import pygame as pg
 
 
 class Card:
+    objects = []
     """Represent any card using image, suit and dignity of it.
     If Class initialisated with screen rect passed - card will be scaled to it"""
     def __init__(self, path, image, screen_rect=None):
@@ -21,3 +22,9 @@ class Card:
         self.selected = False
         self.suit = None
         self.dignity = None
+        Card.objects.append(self)
+
+    @classmethod
+    def deselect_cards(cls):
+        for card in cls.objects:
+            card.selected = False

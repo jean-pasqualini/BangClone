@@ -13,7 +13,7 @@ class Game(states.States):
     def __init__(self, screen_rect):
         super().__init__()
         self.screen_rect = screen_rect
-        self.scaling_factor = int(screen_rect.width / 400)
+        self.scaling_factor = int(self.screen_rect.width / 400)
         self.overlay_bg = pg.Surface((screen_rect.width, screen_rect.height))
         self.overlay_bg.fill(0)
         self.overlay_bg.set_alpha(200)
@@ -46,8 +46,6 @@ class Game(states.States):
         # x and y to place deck in the middle of the screen (a bit left)
         self.play_deck_x = self.screen_rect.centerx - self.card_size[0]
         self.play_deck_y = self.screen_rect.centery - self.card_size[1] / 2
-
-        # gap between cards in 
         self.hand_card_bufferY = 25
         self.bg = tools.Image.load("greenbg.png")
         self.bg_rect = self.bg.get_rect()
@@ -192,6 +190,14 @@ class Game(states.States):
                     self.button_sound.sound.play()
                     return card
 
+    # def deselect_cards(self):
+    #     for card in self.deck:
+    #         card.selected = False
+    #     for card in self.discard:
+    #         card.selected = False
+    #     for card in self.player.buffs:
+    #         card.selected = False 
+
     def same_bool(self, lister):
         """Return true only if all items in lister are true 
         or none of them are true
@@ -200,16 +206,20 @@ class Game(states.States):
 
     def update(self, now, keys):
         if not self.help_overlay:
+            self.discard_to_deck()
             self.update_hand_position()
             self.update_table_decks_pisition()
             self.update_buffs_position()
+            if not self.player.selected_card():
+                card.Card.deselect_cards() 
 
             # TEMPORARY
-            if not self.player.hand and len(self.deck) >= 1:
+            if not self.player.hand and self.deck:
                 if len(self.deck) < 4:
                     self.player.hand = self.draw_cards(len(self.deck))
                 else:
                     self.player.hand = self.draw_cards(4)
+
         else:
             filename = tools.get_filename(self.player.selected_card().path)
             self.help_overlay_title, self.help_overlay_title_rect = self.make_text(
@@ -278,7 +288,6 @@ class Game(states.States):
     def render_buffs(self, screen):
         for card in self.player.buffs:
             screen.blit(card.surf, (card.rect.x, card.rect.y))
-
 
     def render_play_buttons(self, screen):
         """Render play buttons on top of the selected card.
@@ -349,13 +358,22 @@ class Game(states.States):
         for card in self.full_deck:
             if tools.get_category(card.path) not in ["roles", "characters", "other"]:
                 self.deck.append(card)
+        random.shuffle(self.deck)
 
-    def draw_cards(self, card_num):
-        """Return randomly removed cards from deck"""
-        picked_cards = random.sample(self.deck, card_num)
-        for card in picked_cards:
-            self.deck.remove(card)
-        return picked_cards
+    def draw_cards(self, N):
+        """Return last N removed cards from deck"""
+        drawn = self.deck[-N:]
+        self.deck = self.deck[:-N]
+        return drawn
+
+    def discard_to_deck(self):
+        """Pass reshuffled discard deck to play deck,
+        leave last card in discard
+        """
+        if not self.deck:
+            self.deck = self.discard[:-1]
+            random.shuffle(self.deck)
+            self.discard = self.discard[-1:]
 
     def create_full_deck(self):
         """Create full deck from all possible cards in data dict"""
@@ -388,11 +406,4 @@ class Game(states.States):
             self.player.is_hand_set = True
             # TEMPORARY
             self.player.hand = self.draw_cards(7)
-
-class GameUpdate():
-    """TODO"""
-    pass
-
-class GameRender():
-    """TODO"""
-    pass
+            self.deck = self.deck[:15]

@@ -4,7 +4,6 @@ from .. import tools
 
 class States:
     """State parent class"""
-
     def __init__(self):
         self.bogus_rect = pg.Surface([0, 0]).get_rect()
         self.screen_rect = self.bogus_rect
@@ -26,8 +25,7 @@ class States:
         self.rendered = None
         self.next_list = None
         self.last_option = None
-        self.gametitle = "Boom"
-
+        self.gametitle = "BangClone"
         self.menu_option_deselect = (130, 10, 10)
         self.menu_option_select = (235, 25, 25)
         self.title_color = (50, 50, 50)
