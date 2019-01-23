@@ -56,7 +56,9 @@ class Viewer(states.States):
                 if f.endswith(".png"):
                     path = os.path.abspath(os.path.join(root, f))
                     image = pg.image.load(path)
-                    self.cards.append(Card(path, image))
+                    card = Card(path, image)
+                    if tools.get_category(card.path) != "other":
+                        self.cards.append(card)
 
     def callback_test(self):
         print("callback")
