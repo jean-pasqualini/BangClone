@@ -53,8 +53,6 @@ class Player:
             card = self.selected_card()
         self.buffs.append(card)
         self.hand.remove(card)
-        for buff in self.buffs:
-            print(tools.get_filename(buff.path))
 
     def randomize_id(self):
         """Return unique and random string as player's id."""

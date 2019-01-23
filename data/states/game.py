@@ -100,7 +100,12 @@ class Game(states.States):
         self.player2 = player.Player("Bot2")
         #############TEMPORARY#############
 
+################################################################################
+#######################################GAME#####################################
+################################################################################
+
     def card_to_discard(self, card=None):
+        """Remove card from it's storage and move to discard"""
         if not card:
             card = self.player.selected_card()
         if card in self.player.hand:
@@ -111,6 +116,92 @@ class Game(states.States):
             self.discard.append(card)
         self.discard.append(card)
         self.button_sound.sound.play()
+
+    def check_select_deselect_card(self):
+        """Check if card was selected/deselected. 
+        If card is fully visible (the last one or/and selected) 
+        it can be selected everywhere, otherwise only on left side of card.
+        """
+        for card in self.player.hand:
+            half_width = int(card.rect.width / 2)
+            card_left_side = card.rect.inflate(-half_width, 0)
+            card_left_side.x -= int(half_width / 2)
+
+            if card.selected:
+                if card.rect.collidepoint(pg.mouse.get_pos()):
+                    card.selected = not card.selected
+                    self.button_sound.sound.play()
+                    return card
+
+            elif card == self.player.hand[-1]:
+                if card.rect.collidepoint(pg.mouse.get_pos()):
+                    self.player.set_all_cards_select_to_false()
+                    card.selected = True
+                    self.button_sound.sound.play()
+                    return card
+
+            else:
+                if card_left_side.collidepoint(pg.mouse.get_pos()):
+                    self.player.set_all_cards_select_to_false()
+                    card.selected = True
+                    self.button_sound.sound.play()
+                    return card
+
+    def fill_deck(self):
+        """Fill deck with playable cards only"""
+        for card in self.full_deck:
+            if tools.get_category(card.path) not in ["roles", "characters", "other"]:
+                self.deck.append(card)
+        random.shuffle(self.deck)
+
+    def draw_cards(self, N):
+        """Return last N removed cards from deck"""
+        drawn = self.deck[-N:]
+        self.deck = self.deck[:-N]
+        return drawn
+
+    def discard_to_deck(self):
+        """Pass reshuffled discard deck to play deck,
+        leave last card in discard
+        """
+        if not self.deck:
+            self.deck = self.discard[:-1]
+            random.shuffle(self.deck)
+            self.discard = self.discard[-1:]
+
+    def create_full_deck(self):
+        """Create full deck from all possible cards in data dict"""
+        path = os.path.join(tools.Image.path, "cards")
+        for root, dirs, files in os.walk(path):
+            for f in files:
+                if f.endswith(".png"):
+                    path = os.path.abspath(os.path.join(root, f))
+                    image = pg.image.load(path)
+                    filename = tools.get_filename(path)
+                    for i in range(self.database[filename]["max"]):
+                        self.full_deck.append(card.Card(path, image, self.screen_rect))
+
+    def player_equip_gun(self):
+        """Player equip gun, discard previous gun"""
+        card = self.player.equip_gun()
+        if card:
+            self.discard.append(card)
+        self.button_sound.sound.play()
+
+    def player_equip_buff(self):
+        self.player.equip_buff()
+        self.button_sound.sound.play()
+
+    def cleanup(self):
+        pass
+
+    def entry(self):
+        if not self.player.is_hand_set:
+            self.player.is_hand_set = True
+            # TEMPORARY
+            self.player.hand = self.draw_cards(7)
+            self.deck = self.deck[:15]
+
 
     ### SOME OF THESE WILL CALL SIMIAL PLAYER METHODS 
 
@@ -123,7 +214,9 @@ class Game(states.States):
     def card_to_all(self, card):
         pass
 
-    #################################################
+################################################################################
+######################################EVENTS####################################
+################################################################################
 
     def get_event(self, event, keys):
         if not self.help_overlay:
@@ -160,50 +253,10 @@ class Game(states.States):
                 if self.player.selected_card():
                     self.help_overlay = not self.help_overlay
 
-    def check_select_deselect_card(self):
-        """Check if card was selected/deselected. 
-        If card is fully visible (the last one or/and selected) 
-        it can be selected everywhere, otherwise only on left side of card.
-        """
-        for card in self.player.hand:
-            half_width = int(card.rect.width / 2)
-            card_left_side = card.rect.inflate(-half_width, 0)
-            card_left_side.x -= int(half_width / 2)
-
-            if card.selected:
-                if card.rect.collidepoint(pg.mouse.get_pos()):
-                    card.selected = not card.selected
-                    self.button_sound.sound.play()
-                    return card
-
-            elif card == self.player.hand[-1]:
-                if card.rect.collidepoint(pg.mouse.get_pos()):
-                    self.player.set_all_cards_select_to_false()
-                    card.selected = True
-                    self.button_sound.sound.play()
-                    return card
-
-            else:
-                if card_left_side.collidepoint(pg.mouse.get_pos()):
-                    self.player.set_all_cards_select_to_false()
-                    card.selected = True
-                    self.button_sound.sound.play()
-                    return card
-
-    # def deselect_cards(self):
-    #     for card in self.deck:
-    #         card.selected = False
-    #     for card in self.discard:
-    #         card.selected = False
-    #     for card in self.player.buffs:
-    #         card.selected = False 
-
-    def same_bool(self, lister):
-        """Return true only if all items in lister are true 
-        or none of them are true
-        """
-        return all(lister) or not any(lister)
-
+################################################################################
+######################################UPDATE####################################
+################################################################################
+    
     def update(self, now, keys):
         if not self.help_overlay:
             self.discard_to_deck()
@@ -215,10 +268,7 @@ class Game(states.States):
 
             # TEMPORARY
             if not self.player.hand and self.deck:
-                if len(self.deck) < 4:
-                    self.player.hand = self.draw_cards(len(self.deck))
-                else:
-                    self.player.hand = self.draw_cards(4)
+                self.player.hand = self.draw_cards(4) or self.draw_cards(len(self.deck))
 
         else:
             filename = tools.get_filename(self.player.selected_card().path)
@@ -253,6 +303,37 @@ class Game(states.States):
         self.equip_gun_button.rect.y = self.play_card_button.rect.y
         self.equip_buff_button.rect.x = self.play_card_button.rect.right + 5
         self.equip_buff_button.rect.y = self.play_card_button.rect.y
+
+    def update_table_decks_pisition(self):
+        self.deck_thickness_card.rect.y = self.play_deck_y - (0.01 * len(self.deck))
+        self.deck_thickness_card.rect.x = self.play_deck_x - (0.2 * len(self.deck))
+
+    def update_hand_position(self):
+        """Center hand in the middle of the screen,
+        shift all cards after selected to make it fully visible.
+        """
+        move = []
+        hand_width = (len(self.player.hand) + 1) * self.hand_card_bufferX
+        hand_x = self.screen_rect.centerx - hand_width / 2
+        for i, card in enumerate(self.player.hand):
+            card.rect.y = self.screen_rect.bottom - card.surf.get_height() * 1.05
+            if card.selected:
+                card.rect.y -= self.hand_card_bufferY
+                move = self.player.hand[i+1:]
+            card.rect.x = hand_x + i * self.hand_card_bufferX
+        for i, c in enumerate(move):
+            c.rect.x = hand_x + self.player.hand.index(move[i]) * self.hand_card_bufferX  + self.card_size[0] * 1.1 / 2
+
+    def update_buffs_position(self):
+        buffs_width = (len(self.player.hand) + 1) * self.hand_card_bufferX
+        buffs_x = self.screen_rect.centerx - buffs_width / 2
+        for i, card in enumerate(self.player.buffs):
+            card.rect.y = self.screen_rect.bottom - card.surf.get_height() * 1.25
+            card.rect.x = buffs_x + i * self.hand_card_bufferX
+
+################################################################################
+######################################RENDER####################################
+################################################################################
 
     def render(self, screen):
         screen.blit(self.bg, self.bg_rect)
@@ -324,86 +405,8 @@ class Game(states.States):
 
             screen.blit(self.backend_card.surf, (self.play_deck_x, self.play_deck_y))
         if self.discard:
-            screen.blit(self.discard[-1].surf, (self.play_deck_x + self.card_size[0] * 1.1, self.play_deck_y))
-
-    def update_table_decks_pisition(self):
-        self.deck_thickness_card.rect.y = self.play_deck_y - (0.01 * len(self.deck))
-        self.deck_thickness_card.rect.x = self.play_deck_x - (0.2 * len(self.deck))
-
-    def update_hand_position(self):
-        """Center hand in the middle of the screen,
-        shift all cards after selected to make it fully visible.
-        """
-        move = []
-        hand_width = (len(self.player.hand) + 1) * self.hand_card_bufferX
-        hand_x = self.screen_rect.centerx - hand_width / 2
-        for i, card in enumerate(self.player.hand):
-            card.rect.y = self.screen_rect.bottom - card.surf.get_height() * 1.05
-            if card.selected:
-                card.rect.y -= self.hand_card_bufferY
-                move = self.player.hand[i+1:]
-            card.rect.x = hand_x + i * self.hand_card_bufferX
-        for i, c in enumerate(move):
-            c.rect.x = hand_x + self.player.hand.index(move[i]) * self.hand_card_bufferX  + self.card_size[0] * 1.1 / 2
-
-    def update_buffs_position(self):
-        buffs_width = (len(self.player.hand) + 1) * self.hand_card_bufferX
-        buffs_x = self.screen_rect.centerx - buffs_width / 2
-        for i, card in enumerate(self.player.buffs):
-            card.rect.y = self.screen_rect.bottom - card.surf.get_height() * 1.25
-            card.rect.x = buffs_x + i * self.hand_card_bufferX
-
-    def fill_deck(self):
-        """Fill deck with playable cards only"""
-        for card in self.full_deck:
-            if tools.get_category(card.path) not in ["roles", "characters", "other"]:
-                self.deck.append(card)
-        random.shuffle(self.deck)
-
-    def draw_cards(self, N):
-        """Return last N removed cards from deck"""
-        drawn = self.deck[-N:]
-        self.deck = self.deck[:-N]
-        return drawn
-
-    def discard_to_deck(self):
-        """Pass reshuffled discard deck to play deck,
-        leave last card in discard
-        """
-        if not self.deck:
-            self.deck = self.discard[:-1]
-            random.shuffle(self.deck)
-            self.discard = self.discard[-1:]
-
-    def create_full_deck(self):
-        """Create full deck from all possible cards in data dict"""
-        path = os.path.join(tools.Image.path, "cards")
-        for root, dirs, files in os.walk(path):
-            for f in files:
-                if f.endswith(".png"):
-                    path = os.path.abspath(os.path.join(root, f))
-                    image = pg.image.load(path)
-                    filename = tools.get_filename(path)
-                    for i in range(self.database[filename]["max"]):
-                        self.full_deck.append(card.Card(path, image, self.screen_rect))
-
-    def player_equip_gun(self):
-        """Player equip gun, discard previous gun"""
-        card = self.player.equip_gun()
-        if card:
-            self.discard.append(card)
-        self.button_sound.sound.play()
-
-    def player_equip_buff(self):
-        self.player.equip_buff()
-        self.button_sound.sound.play()
-
-    def cleanup(self):
-        pass
-
-    def entry(self):
-        if not self.player.is_hand_set:
-            self.player.is_hand_set = True
-            # TEMPORARY
-            self.player.hand = self.draw_cards(7)
-            self.deck = self.deck[:15]
+            screen.blit(self.discard[-1].surf, 
+                        (self.play_deck_x + self.card_size[0] * 1.1, 
+                         self.play_deck_y
+                         )
+            )

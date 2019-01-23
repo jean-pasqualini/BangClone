@@ -2,14 +2,16 @@ import pygame as pg
 
 
 class Card:
-    objects = []
     """Represent any card using image, suit and dignity of it.
-    If Class initialisated with screen rect passed - card will be scaled to it"""
+    If Class initialisated with screen rect passed - card will be scaled to it.
+    Store all objects in class list variable
+    """
+    objects = []
     def __init__(self, path, image, screen_rect=None):
         if screen_rect:
             image_rect = image.get_rect()
             card_aspect_ratio = image_rect.width / image_rect.height
-            scale_factor = 3.3
+            scale_factor = 4
             card_size_scaled = (int((screen_rect.height / scale_factor) * card_aspect_ratio),
                                 int(screen_rect.height / scale_factor),
             )
