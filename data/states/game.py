@@ -19,11 +19,9 @@ class Game(states.States):
         self.overlay_bg.set_alpha(200)
         self.overlay_card_position = (100, 200)
         self.database = data.data
-        self.full_deck = []
-        self.create_full_deck()
-        self.card_size = self.full_deck[0].rect.size
         self.deck = []  # only playable cards
-        self.fill_deck()
+        self.create_deck()
+        self.card_size = self.deck[0].rect.size
         self.table = []
         self.discard = []
         self.backend_path = os.path.join(tools.Image.path, "cards/other/backend.png")
@@ -146,13 +144,6 @@ class Game(states.States):
                     self.button_sound.sound.play()
                     return card
 
-    def fill_deck(self):
-        """Fill deck with playable cards only"""
-        for card in self.full_deck:
-            if tools.get_category(card.path) not in ["roles", "characters", "other"]:
-                self.deck.append(card)
-        random.shuffle(self.deck)
-
     def draw_cards(self, N):
         """Return last N removed cards from deck"""
         drawn = self.deck[-N:]
@@ -168,8 +159,8 @@ class Game(states.States):
             random.shuffle(self.deck)
             self.discard = self.discard[-1:]
 
-    def create_full_deck(self):
-        """Create full deck from all possible cards in data dict"""
+    def create_deck(self):
+        """Fill shuffled deck with playable decks in specified amounts from db"""
         path = os.path.join(tools.Image.path, "cards")
         for root, dirs, files in os.walk(path):
             for f in files:
@@ -177,8 +168,10 @@ class Game(states.States):
                     path = os.path.abspath(os.path.join(root, f))
                     image = pg.image.load(path)
                     filename = tools.get_filename(path)
-                    for i in range(self.database[filename]["max"]):
-                        self.full_deck.append(card.Card(path, image, self.screen_rect))
+                    if tools.get_category(path) not in ["roles", "characters", "other"]:
+                        for i in range(self.database[filename]["max"]):
+                            self.deck.append(card.Card(path, image, self.screen_rect))
+        random.shuffle(self.deck)
 
     def player_equip_gun(self):
         """Player equip gun, discard previous gun"""
@@ -200,7 +193,6 @@ class Game(states.States):
             # TEMPORARY
             self.player.hand = self.draw_cards(7)
             self.deck = self.deck[:15]
-
 
     ### SOME OF THESE WILL CALL SIMIAL PLAYER METHODS 
 

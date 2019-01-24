@@ -35,7 +35,7 @@ class Viewer(states.States):
         self.play_button_height = 15 * self.scaling_factor
         self.next_button = button.Button(
             (self.screen_rect.left + 50 * self.scaling_factor, 
-             self.screen_rect.centery - self.play_button_height / 2, 
+             self.screen_rect.centery + 50 * self.scaling_factor, 
              self.play_button_width, 
              self.play_button_height
             ),
@@ -46,7 +46,7 @@ class Viewer(states.States):
         )
         self.prev_button = button.Button(
             (self.screen_rect.right - 50 * self.scaling_factor - self.play_button_width, 
-             self.screen_rect.centery - self.play_button_height / 2,
+             self.screen_rect.centery + 50 * self.scaling_factor,
              self.play_button_width, 
              self.play_button_height
             ),
