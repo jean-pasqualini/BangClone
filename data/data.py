@@ -13,7 +13,6 @@ data = {
         "max": 1,
     },
 
-
     # ACTIONS
     "panic": {
         "info": "Draw a card from a player at distance 1. This distance is not modified by weapons, but by cards such as Mustang and/or Scope.",
@@ -101,6 +100,7 @@ data = {
         "max": 3,
         "action": "self_table",
     },
+    # GUNS
     "remington": {
         "info": "Shoot at distance 3.",
         "max": 3,
@@ -143,6 +143,90 @@ data = {
         "life": 4,
         "max": 1,
     },
+    # BANG CHARS
+    "bart_cassidy":{
+        "info": "Each time he loses a life point, he immediately draws a card from the deck",
+        "life": 4,
+        "max": 1,
+    },
+    "tom_ketchum":{
+        "info": "During phase 1 of his turn, he must show the second card he draws: \
+                 if it's a Heart or Diamond, he draws one additional card that turn (without revealing it).",
+        "life": 4,
+        "max": 1,
+    },
+    "calamity_jane":{
+        "info": "She can use 'Bang!' cards as 'Missed!' cards and vice versa. She is still subject to 'Bang!' limitations.",
+        "life": 4,
+        "max": 1,
+    },
+    "gringo":{
+        "info": "Each time he loses a life point due to a card played by another player, he draws a random card from the hands of that player (one card for each life).",
+        "life": 3,
+        "max": 1,
+    },
+    "jesse_james":{
+        "info": "During phase 1 of his turn, he may choose to draw the first card from the deck, or randomly from the hand of any other player.",
+        "life": 4,
+        "max": 1,
+    },
+    "jourdonnais":{
+        "info": " He is considered to have Barrel in play at all times.",
+        "life": 4,
+        "max": 1,
+    },
+    "kit_carson":{
+        "info": "During the phase 1 of his turn, he looks at the top three cards of the deck: he chooses 2 to draw, and puts the other one back on the top of the deck, face down.",
+        "life": 4,
+        "max": 1,
+    },
+    "lucky_luke":{
+        "info": "Each time he is required to 'draw!', he flips the top two cards from the deck, and chooses the result he prefers.",
+        "life": 4,
+        "max": 1,
+    },
+    "paul_regret":{
+        "info": "He is considered to have a Mustang in play at all times.",
+        "life": 3,
+        "max": 1,
+    },
+    "tuco_ramirez":{
+        "info": "During phase 1 of his turn, he may choose to draw the first card from the top of the discard pile or from the deck.",
+        "life": 4,
+        "max": 1,
+    },
+    "rose_doolan":{
+        "info": "She is considered to have a Scope in play at all times.",
+        "life": 4,
+        "max": 1,
+    },
+    "black_jack":{
+        "info": "At any time, he may discard 2 cards from his hand to regain one life point.",
+        "life": 4,
+        "max": 1,
+    },
+    "angel_eyes":{
+        "info": "Players trying to cancel his BANG! cards need to play 2 Missed!",
+        "life": 4,
+        "max": 1,
+    },
+    "suzy_lafayette":{
+        "info": "As soon as she has no cards in her hand, she instantly draws a card from the draw pile.",
+        "life": 4,
+        "max": 1,
+    },
+    "vulture_sam":{
+        "info": "Whenever a character is eliminated from the game, Sam takes all the cards that player had in his hand and in play, and adds them to his hand. ",
+        "life": 4,
+        "max": 1,
+    },
+    "billy_the_kid":{
+        "info": "He can play any number of 'Bang!' cards.",
+        "life": 4,
+        "max": 1,
+    },
+
+
     # other (non playable cards)
     "backend": {"info": "Cards back side", "max": 0},
     "deck_thickness": {"info": "Card for offset thickness", "max": 0},
