@@ -1,4 +1,5 @@
 import random
+import os
 import string
 from . import tools
 
@@ -12,7 +13,10 @@ class Player:
         self.id = self.randomize_id()
         self.nickname = nickname
         self.role = role
-        self.character = character
+        if not character:
+            self.character = self.random_character()
+        else:
+            self.character = character
         self.hand = None
         self.is_hand_set = False        
         self.gun = None
@@ -22,7 +26,7 @@ class Player:
         self.buffs = []
         self.curses = []
         Player.objects.append(self)
-        print(f"Player name: {self.nickname}, player id: {self.id} joined game")
+        print(f"Player name: {self.nickname}, player id: {self.id}, role: {self.character} joined game")
 
 
     def selected_card(self):
@@ -60,6 +64,16 @@ class Player:
         while id in Player.objects:
             self.randomize_id()
         return id
+
+    def random_character(self):
+        """Return random filename without extension from chars folder"""
+        roles = []
+        path = os.path.join(tools.Image.path, "chars")
+        for root, dirs, files in os.walk(path):
+            for f in files:
+                if f.endswith(".png"):
+                    roles.append(f[:-4])
+        return random.choice(roles)
 
     @classmethod
     def get_player_by_id(cls, id):
