@@ -126,23 +126,7 @@ data = {
         "max": 3,
         "action": "self_table",
     },
-    # characters
-    "capone": {
-        "info": "Each time another player is eliminated, he regains 2 life points",
-        "life": 4,
-        "max": 1,
-    },
-    "costello": {"info": "He may use any card as a Miss card", "life": 3, "max": 1},
-    "gillis": {
-        "info": "During his turn he may choose to lose one life to draw two cards",
-        "life": 4,
-        "max": 1,
-    },
-    "gotti": {
-        "info": "For onr whole round, he gains the same ability of another character in play of his choice",
-        "life": 4,
-        "max": 1,
-    },
+
     # BANG CHARS
     "bart_cassidy":{
         "info": "Each time he loses a life point, he immediately draws a card from the deck",
@@ -225,13 +209,18 @@ data = {
         "life": 4,
         "max": 1,
     },
-
-
     # other (non playable cards)
     "backend": {"info": "Cards back side", "max": 0},
     "deck_thickness": {"info": "Card for offset thickness", "max": 0},
     "gun_placeholder": {"info": "Card for offset thickness", "max": 0},
     "card_placeholder": {"info": "Card for offset thickness", "max": 0},
+}
+
+roles = {
+    "sheriff": {"info": "Must eliminate all the Outlaws and the Renegade, to protect law and order.", "max": 1},
+    "deputy": {"info": "Help and protect the Sheriff, and share his same goal, at all costs!", "max": {"4": 2, "5": 2, "6": 3, "7": 3}},
+    "outlaw": {"info": "Would like to kill the Sheriff, but they have no scruples about eliminating each other to gain rewards!", "max": {"4": 0, "5": 1, "6": 1, "7": 2}},
+    "renegade": {"info": "Wants to be the new Sheriff; his goal is to be the last character in play.", "max": 1}
 }
 
 if __name__ == "__main__":
