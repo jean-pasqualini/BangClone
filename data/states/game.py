@@ -271,28 +271,30 @@ class Game(states.States):
             # TEMPORARY
             if not self.player.hand and self.deck:
                 self.player.hand = self.draw_cards(4) or self.draw_cards(len(self.deck))
-
         else:
-            filename = tools.get_filename(self.player.selected_card().path)
-            self.help_overlay_title, self.help_overlay_title_rect = self.make_text(
-                filename.title(),
-                (255, 255, 255),
-                (self.screen_rect.centerx, 100),
-                60,
-                fonttype="impact.ttf",
-            )
+            self.update_overlay()
 
-            string = self.database[filename]["info"]
-            my_font = tools.Font.load("impact.ttf", 20)
-            self.help_overlay_text_rect = pg.Rect((400, 200, 300, 300))
-            self.help_overlay_text = tools.render_textrect(
-                string,
-                my_font,
-                self.help_overlay_text_rect,
-                (216, 216, 216),
-                (48, 48, 48, 255),
-                0,
-            )
+    def update_overlay(self):
+        filename = tools.get_filename(self.player.selected_card().path)
+        self.help_overlay_title, self.help_overlay_title_rect = self.make_text(
+            filename.title(),
+            (255, 255, 255),
+            (self.screen_rect.centerx, 100),
+            60,
+            fonttype="impact.ttf",
+        )
+
+        string = self.database[filename]["info"]
+        my_font = tools.Font.load("impact.ttf", 20)
+        self.help_overlay_text_rect = pg.Rect((400, 200, 300, 300))
+        self.help_overlay_text = tools.render_textrect(
+            string,
+            my_font,
+            self.help_overlay_text_rect,
+            (216, 216, 216),
+            (48, 48, 48, 255),
+            0,
+        )
 
     def reposition_card_buttons(self):
         """place buttons on top of the selected card"""
