@@ -54,8 +54,8 @@ class Game(states.States):
         self.help_btn_image_rect = self.help_btn_image.get_rect(topleft=(0, 0))
 
         self.settings = tools.Image.load("gear.png")
-        self.settings = pg.transform.scale(self.settings, (25, 25))
-        self.settings_rect = self.settings.get_rect(topleft=(25, 0))
+        self.settings = pg.transform.scale(self.settings, (25 * self.scaling_factor, 25 * self.scaling_factor))
+        self.settings_rect = self.settings.get_rect()
 
         button_config = {
             "hover_color": (100, 255, 100),
@@ -64,7 +64,7 @@ class Game(states.States):
             "hover_font_color": (0, 0, 0),
             "font": tools.Font.load("impact.ttf", 8 * self.scaling_factor),
             "font_color": (0, 0, 0),
-            "call_on_release": True,
+            "call_on_release": False,
         }
 
         self.play_button_width =  40 * self.scaling_factor
@@ -99,6 +99,10 @@ class Game(states.States):
                                                                        60 * self.scaling_factor)
         )
         self.player.character_image_rect = self.player.character_image.get_rect()
+
+        self.bullet = tools.Image.load("bullet.png")
+        self.bullet = pg.transform.scale(self.bullet, (15 * self.scaling_factor, 15 * self.scaling_factor))
+        self.bullet_rect = self.bullet.get_rect(topleft=(25, 0))
 
         #############TEMPORARY#############
         self.player1 = player.Player("Bot1")
@@ -200,7 +204,6 @@ class Game(states.States):
             self.player.is_hand_set = True
             # TEMPORARY
             self.player.hand = self.draw_cards(7)
-            self.deck = self.deck[:15]
 
     ### SOME OF THESE WILL CALL SIMIAL PLAYER METHODS
 
@@ -342,8 +345,16 @@ class Game(states.States):
         self.render_hand(screen)
         self.render_role(screen)
         self.render_character(screen)
+        self.render_health(screen)
         if self.help_overlay:
             self.render_overlay(screen)
+
+    def render_health(self, screen):
+        for i in range(self.player.health):
+            screen.blit(self.bullet,
+                    (8 * self.scaling_factor + self.screen_rect.left + self.scaling_factor * i * 18,
+                     self.screen_rect.bottom - self.player.role_image_rect.height * 1.65)
+        )
 
     def render_gun(self, screen):
         screen.blit(self.gun_placeholder_card.surf,

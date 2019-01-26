@@ -26,9 +26,9 @@ parser.add_argument(
     "-s",
     "--size",
     nargs=2,
-    default=[1024, 768],
+    default=[1280, 800],
     metavar=("WIDTH", "HEIGHT"),
-    help="set window size to WIDTH HEIGHT, defualt is 1024 768",
+    help="set window size to WIDTH HEIGHT, defualt is 1280 800",
 )
 args = vars(parser.parse_args())
 
