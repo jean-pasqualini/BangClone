@@ -7,7 +7,7 @@ from . import states
 
 
 class Game(states.States):
-    """For now(!): Create screen, 
+    """For now(!): Create screen,
     update both Player and Game, render gathered data
     """
     def __init__(self, screen_rect):
@@ -48,7 +48,7 @@ class Game(states.States):
         self.bg_rect = self.bg.get_rect()
 
         self.help_btn_image = tools.Image.load("info.png")
-        self.help_btn_image = pg.transform.scale(self.help_btn_image, (25 * self.scaling_factor, 
+        self.help_btn_image = pg.transform.scale(self.help_btn_image, (25 * self.scaling_factor,
                                                                        25 * self.scaling_factor)
         )
         self.help_btn_image_rect = self.help_btn_image.get_rect(topleft=(0, 0))
@@ -91,6 +91,14 @@ class Game(states.States):
             **button_config,
         )
         self.player = player.Player("Tarn")
+        self.player.role_image = pg.transform.scale(self.player.role_image, (50 * self.scaling_factor,
+                                                                       50 * self.scaling_factor)
+        )
+        self.player.role_image_rect = self.player.role_image.get_rect()
+        self.player.character_image = pg.transform.scale(self.player.character_image, (60 * self.scaling_factor,
+                                                                       60 * self.scaling_factor)
+        )
+        self.player.character_image_rect = self.player.character_image.get_rect()
 
         #############TEMPORARY#############
         self.player1 = player.Player("Bot1")
@@ -100,7 +108,7 @@ class Game(states.States):
 ################################################################################
 #######################################GAME#####################################
 ################################################################################
-    
+
     def card_to_discard(self, card=None):
         """Remove card from it's storage and move to discard"""
         if not card:
@@ -115,8 +123,8 @@ class Game(states.States):
         self.button_sound.sound.play()
 
     def check_select_deselect_card(self):
-        """Check if card was selected/deselected. 
-        If card is fully visible (the last one or/and selected) 
+        """Check if card was selected/deselected.
+        If card is fully visible (the last one or/and selected)
         it can be selected everywhere, otherwise only on left side of card.
         """
         for card in self.player.hand:
@@ -194,7 +202,7 @@ class Game(states.States):
             self.player.hand = self.draw_cards(7)
             self.deck = self.deck[:15]
 
-    ### SOME OF THESE WILL CALL SIMIAL PLAYER METHODS 
+    ### SOME OF THESE WILL CALL SIMIAL PLAYER METHODS
 
     def card_to_table(self, card):
         pass
@@ -247,7 +255,7 @@ class Game(states.States):
 ################################################################################
 ######################################UPDATE####################################
 ################################################################################
-    
+
     def update(self, now, keys):
         if not self.help_overlay:
             self.discard_to_deck()
@@ -255,7 +263,7 @@ class Game(states.States):
             self.update_table_decks_pisition()
             self.update_buffs_position()
             if not self.player.selected_card():
-                card.Card.deselect_cards() 
+                card.Card.deselect_cards()
 
             # TEMPORARY
             if not self.player.hand and self.deck:
@@ -286,8 +294,8 @@ class Game(states.States):
     def reposition_card_buttons(self):
         """place buttons on top of the selected card"""
         self.play_card_button.rect.center = self.player.selected_card().rect.center
-        self.play_card_button.rect.y -= (self.card_size[1] / 2 
-                                        + self.play_button_height/2 
+        self.play_card_button.rect.y -= (self.card_size[1] / 2
+                                        + self.play_button_height/2
                                         + 2 * self.scaling_factor
                                         )
         self.equip_gun_button.rect.x = self.play_card_button.rect.right + 5
@@ -332,19 +340,33 @@ class Game(states.States):
         self.render_gun(screen)
         self.render_buffs(screen)
         self.render_hand(screen)
-        if self.help_overlay: 
+        self.render_role(screen)
+        self.render_character(screen)
+        if self.help_overlay:
             self.render_overlay(screen)
 
     def render_gun(self, screen):
-        screen.blit(self.gun_placeholder_card.surf, 
-                    (self.screen_rect.width - self.card_size[0] - self.scaling_factor, 
+        screen.blit(self.gun_placeholder_card.surf,
+                    (self.screen_rect.width - self.card_size[0] - self.scaling_factor,
                      self.screen_rect.bottom - self.card_size[1] * 1.05)
-            )
+        )
         if self.player.gun:
-            screen.blit(self.player.gun.surf, 
-                        (self.screen_rect.width - self.card_size[0] - self.scaling_factor, 
+            screen.blit(self.player.gun.surf,
+                        (self.screen_rect.width - self.card_size[0] - self.scaling_factor,
                          self.screen_rect.bottom - self.card_size[1] * 1.05)
             )
+
+    def render_role(self, screen):
+        screen.blit(self.player.role_image,
+                    (self.screen_rect.left + 50 * self.scaling_factor,
+                     self.screen_rect.bottom - (self.card_size[1] / 2 * 1.05) - self.player.role_image_rect.height / 2)
+        )
+
+    def render_character(self, screen):
+        screen.blit(self.player.character_image,
+                    (self.screen_rect.left + 10 * self.scaling_factor,
+                     self.screen_rect.bottom - (self.card_size[1] / 2 * 1.05) - self.player.character_image_rect.height / 2)
+        )
 
     def render_hand(self, screen):
         c = None
@@ -396,8 +418,8 @@ class Game(states.States):
 
             screen.blit(self.backend_card.surf, (self.play_deck_x, self.play_deck_y))
         if self.discard:
-            screen.blit(self.discard[-1].surf, 
-                        (self.play_deck_x + self.card_size[0] * 1.1, 
+            screen.blit(self.discard[-1].surf,
+                        (self.play_deck_x + self.card_size[0] * 1.1,
                          self.play_deck_y
                          )
             )
