@@ -523,3 +523,7 @@ class Game(states.States):
                          self.play_deck_y
                          )
             )
+
+class GameFlow():
+    def __init__(self, players, **kwargs):
+        pass

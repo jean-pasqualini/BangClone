@@ -1,7 +1,7 @@
 import random
 import os
 import string
-from . import tools
+from . import tools, data
 import pygame as pg
 
 class Player:
@@ -26,7 +26,7 @@ class Player:
         self.is_hand_set = False
         self.gun = None
         self.active_cards = []
-        self.health = health
+        self.health = data.data[self.character]["life"]
         self.alive = True
         self.buffs = []
         self.curses = []

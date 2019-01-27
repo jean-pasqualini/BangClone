@@ -128,7 +128,7 @@ data = {
     },
 
     # BANG CHARS
-    "bart_cassidy":{
+    "butch_cassidy":{
         "info": "Each time he loses a life point, he immediately draws a card from the deck",
         "life": 4,
         "max": 1,
