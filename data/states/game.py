@@ -18,7 +18,8 @@ class Game(states.States):
         self.overlay_bg.fill(0)
         self.overlay_bg.set_alpha(200)
         self.overlay_card_position = (100, 200)
-        self.database = data.data
+        self.cards_database = data.data
+        self.roles_database = data.roles
         self.deck = []  # only playable cards
         self.create_deck()
         self.card_size = self.deck[0].rect.size
@@ -37,7 +38,9 @@ class Game(states.States):
             self.thickness_path, pg.image.load(self.gun_placeholder_path), self.screen_rect
         )
         self.bg_color = (255, 255, 255)
-        self.help_overlay = False
+        self.card_help_overlay = False
+        self.character_overlay = False
+        self.role_overlay = False
         self.hand_card_bufferX = self.card_size[0] / 2
 
         # x and y to place deck in the middle of the screen (a bit left)
@@ -46,7 +49,6 @@ class Game(states.States):
         self.hand_card_bufferY = 10 * self.scaling_factor
         self.bg = tools.Image.load("greenbg.png")
         self.bg_rect = self.bg.get_rect()
-
         self.help_btn_image = tools.Image.load("info.png")
         self.help_btn_image = pg.transform.scale(self.help_btn_image, (25 * self.scaling_factor,
                                                                        25 * self.scaling_factor)
@@ -99,6 +101,15 @@ class Game(states.States):
                                                                        60 * self.scaling_factor)
         )
         self.player.character_image_rect = self.player.character_image.get_rect()
+
+        self.role_rect = pg.Rect((self.screen_rect.left + 50 * self.scaling_factor,
+                           self.screen_rect.bottom - (self.card_size[1] / 2 * 1.05) - self.player.role_image_rect.height / 2),
+                          (self.player.role_image_rect.width, self.player.role_image_rect.height)
+        )
+        self.character_rect = pg.Rect((self.screen_rect.left + 10 * self.scaling_factor,
+                                self.screen_rect.bottom - (self.card_size[1] / 2 * 1.05) - self.player.character_image_rect.height / 2),
+                                (self.player.character_image_rect.width, self.player.character_image_rect.height)
+        )
 
         self.bullet = tools.Image.load("bullet.png")
         self.bullet = pg.transform.scale(self.bullet, (15 * self.scaling_factor, 15 * self.scaling_factor))
@@ -181,7 +192,7 @@ class Game(states.States):
                     image = pg.image.load(path)
                     filename = tools.get_filename(path)
                     if tools.get_category(path) not in ["roles", "characters", "other"]:
-                        for i in range(self.database[filename]["max"]):
+                        for i in range(self.cards_database[filename]["max"]):
                             self.deck.append(card.Card(path, image, self.screen_rect))
         random.shuffle(self.deck)
 
@@ -221,7 +232,7 @@ class Game(states.States):
 ################################################################################
 
     def get_event(self, event, keys):
-        if not self.help_overlay:
+        if not self.card_help_overlay:
             if self.player.selected_card():
                 selected_card = self.player.selected_card()
                 self.play_card_button.check_event(event)
@@ -234,49 +245,59 @@ class Game(states.States):
                     if tools.get_filename(selected_card.path) not in buff_names:
                         self.equip_buff_button.check_event(event)
 
+            if self.role_rect.collidepoint(pg.mouse.get_pos()) and not self.character_rect.collidepoint(pg.mouse.get_pos()):
+                    self.role_overlay = True
+            else:
+                self.role_overlay = False
+            if self.character_rect.collidepoint(pg.mouse.get_pos()):
+                self.character_overlay = True
+            else:
+                self.character_overlay = False
+
         if event.type == pg.QUIT:
             self.quit = True
         elif event.type == pg.KEYDOWN:
             if event.key == self.keybinding["back"]:
-                if not self.help_overlay:
+                if not self.card_help_overlay:
                     self.button_sound.sound.play()
                     self.done = True
                     self.next = "MENU"
                 else:
-                    self.help_overlay = not self.help_overlay
+                    self.card_help_overlay = not self.card_help_overlay
 
         elif event.type == self.background_music.track_end:
             self.play_next_track()
 
         elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-            if not self.help_overlay:
+            if not self.card_help_overlay:
                 self.check_select_deselect_card()
             if self.help_btn_image_rect.collidepoint(pg.mouse.get_pos()):
                 if self.player.selected_card():
-                    self.help_overlay = not self.help_overlay
+                    self.card_help_overlay = not self.card_help_overlay
 
 ################################################################################
 ######################################UPDATE####################################
 ################################################################################
 
     def update(self, now, keys):
-        if not self.help_overlay:
-            self.discard_to_deck()
-            self.update_hand_position()
-            self.update_table_decks_pisition()
-            self.update_buffs_position()
-            if not self.player.selected_card():
-                card.Card.deselect_cards()
+        self.discard_to_deck()
+        self.update_hand_position()
+        self.update_table_decks_pisition()
+        self.update_buffs_position()
+        if not self.player.selected_card():
+            card.Card.deselect_cards()
+        if self.card_help_overlay:
+            self.update_card_overlay()
+        if self.character_overlay:
+            self.update_character_overlay()
+        if self.role_overlay:
+            self.update_role_overlay()
+        if not self.player.hand and self.deck: # TEMPORARY
+            self.player.hand = self.draw_cards(4) or self.draw_cards(len(self.deck))
 
-            # TEMPORARY
-            if not self.player.hand and self.deck:
-                self.player.hand = self.draw_cards(4) or self.draw_cards(len(self.deck))
-        else:
-            self.update_overlay()
-
-    def update_overlay(self):
+    def update_card_overlay(self):
         filename = tools.get_filename(self.player.selected_card().path)
-        self.help_overlay_title, self.help_overlay_title_rect = self.make_text(
+        self.card_help_overlay_title, self.card_help_overlay_title_rect = self.make_text(
             filename.title(),
             (255, 255, 255),
             (self.screen_rect.centerx, 100),
@@ -284,20 +305,64 @@ class Game(states.States):
             fonttype="impact.ttf",
         )
 
-        string = self.database[filename]["info"]
+        string = self.cards_database[filename]["info"]
         my_font = tools.Font.load("impact.ttf", 20)
-        self.help_overlay_text_rect = pg.Rect((400, 200, 300, 300))
-        self.help_overlay_text = tools.render_textrect(
+        self.card_help_overlay_text_rect = pg.Rect((400, 200, 300, 300))
+        self.card_help_overlay_text = tools.render_textrect(
             string,
             my_font,
-            self.help_overlay_text_rect,
+            self.card_help_overlay_text_rect,
+            (216, 216, 216),
+            (48, 48, 48, 255),
+            0,
+        )
+
+    def update_role_overlay(self):
+        role = self.player.role
+        self.role_overlay_title, self.role_overlay_title_rect = self.make_text(
+            role.title(),
+            (255, 255, 255),
+            (self.screen_rect.centerx, 100),
+            60,
+            fonttype="impact.ttf",
+        )
+
+        string = self.roles_database[role]["info"]
+        my_font = tools.Font.load("impact.ttf", 20)
+        self.role_overlay_text_rect = pg.Rect((400, 200, 300, 300))
+        self.role_overlay_text = tools.render_textrect(
+            string,
+            my_font,
+            self.role_overlay_text_rect,
+            (216, 216, 216),
+            (48, 48, 48, 255),
+            0,
+        )
+
+    def update_character_overlay(self):
+        character = self.player.character
+        self.character_overlay_title, self.character_overlay_title_rect = self.make_text(
+            character.replace("_", " ").title(),
+            (255, 255, 255),
+            (self.screen_rect.centerx, 100),
+            60,
+            fonttype="impact.ttf",
+        )
+
+        string = self.cards_database[character]["info"]
+        my_font = tools.Font.load("impact.ttf", 20)
+        self.character_overlay_text_rect = pg.Rect((400, 200, 300, 300))
+        self.character_overlay_text = tools.render_textrect(
+            string,
+            my_font,
+            self.character_overlay_text_rect,
             (216, 216, 216),
             (48, 48, 48, 255),
             0,
         )
 
     def reposition_card_buttons(self):
-        """place buttons on top of the selected card"""
+        """Place buttons on top of the selected card"""
         self.play_card_button.rect.center = self.player.selected_card().rect.center
         self.play_card_button.rect.y -= (self.card_size[1] / 2
                                         + self.play_button_height/2
@@ -348,8 +413,12 @@ class Game(states.States):
         self.render_role(screen)
         self.render_character(screen)
         self.render_health(screen)
-        if self.help_overlay:
-            self.render_overlay(screen)
+        if self.card_help_overlay:
+            self.render_card_overlay(screen)
+        if self.role_overlay:
+            self.render_role_overlay(screen)
+        if self.character_overlay:
+            self.render_character_overlay(screen)
 
     def render_health(self, screen):
         for i in range(self.player.health):
@@ -415,12 +484,26 @@ class Game(states.States):
                     self.equip_buff_button.render(screen)
             screen.blit(self.help_btn_image, self.help_btn_image_rect)
 
-    def render_overlay(self, screen):
+    def render_card_overlay(self, screen):
         screen.blit(self.overlay_bg, (0, 0))
-        screen.blit(self.help_overlay_title, self.help_overlay_title_rect)
-        screen.blit(self.help_overlay_text, self.help_overlay_text_rect)
+        screen.blit(self.card_help_overlay_title, self.card_help_overlay_title_rect)
+        screen.blit(self.card_help_overlay_text, self.card_help_overlay_text_rect)
         sel = self.player.selected_card()
         screen.blit(sel.surf, self.overlay_card_position)
+
+    def render_role_overlay(self, screen):
+        screen.blit(self.overlay_bg, (0, 0))
+        screen.blit(self.role_overlay_title, self.role_overlay_title_rect)
+        screen.blit(self.role_overlay_text, self.role_overlay_text_rect)
+        image = pg.transform.scale(self.player.role_image, (100 * self.scaling_factor, 100 * self.scaling_factor))
+        screen.blit(image, self.overlay_card_position)
+
+    def render_character_overlay(self, screen):
+        screen.blit(self.overlay_bg, (0, 0))
+        screen.blit(self.character_overlay_title, self.character_overlay_title_rect)
+        screen.blit(self.character_overlay_text, self.character_overlay_text_rect)
+        image = pg.transform.scale(self.player.character_image, (100 * self.scaling_factor, 100 * self.scaling_factor))
+        screen.blit(image, self.overlay_card_position)
 
     def render_table_decks(self, screen):
         if self.deck:
