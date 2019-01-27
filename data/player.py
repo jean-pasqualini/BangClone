@@ -9,7 +9,7 @@ class Player:
     transmitting actions to Game and receiving updates
     """
     objects = []
-    def __init__(self, nickname, role=None, character=None, health=4):
+    def __init__(self, nickname, role=None, character=None):
         super().__init__()
         self.id = self.randomize_id()
         self.nickname = nickname
@@ -27,6 +27,8 @@ class Player:
         self.gun = None
         self.active_cards = []
         self.health = data.data[self.character]["life"]
+        if self.role == "sheriff":
+            self.health += 1
         self.alive = True
         self.buffs = []
         self.curses = []
