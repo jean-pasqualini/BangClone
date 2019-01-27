@@ -17,7 +17,11 @@ class Game(states.States):
         self.overlay_bg = pg.Surface((screen_rect.width, screen_rect.height))
         self.overlay_bg.fill(0)
         self.overlay_bg.set_alpha(200)
-        self.overlay_card_position = (self.screen_rect.centerx / 4, 200)
+        self.overlay_rect = pg.Rect((self.screen_rect.centerx * 1.1, 
+                                                    200, 
+                                                    100 * self.scaling_factor,
+                                                    100 * self.scaling_factor)
+                                                   )
         self.cards_database = data.data
         self.roles_database = data.roles
         self.deck = []  # only playable cards
@@ -307,7 +311,7 @@ class Game(states.States):
 
         string = self.cards_database[filename]["info"]
         my_font = tools.Font.load("impact.ttf", 20)
-        self.card_help_overlay_text_rect = pg.Rect((400, 200, 300, 300))
+        self.card_help_overlay_text_rect = self.overlay_rect
         self.card_help_overlay_text = tools.render_textrect(
             string,
             my_font,
@@ -329,7 +333,7 @@ class Game(states.States):
 
         string = self.roles_database[role]["info"]
         my_font = tools.Font.load("impact.ttf", 20)
-        self.role_overlay_text_rect = pg.Rect((self.screen_rect.centerx, 200, 300, 300))
+        self.role_overlay_text_rect = self.overlay_rect
         self.role_overlay_text = tools.render_textrect(
             string,
             my_font,
@@ -351,7 +355,7 @@ class Game(states.States):
 
         string = self.cards_database[character]["info"]
         my_font = tools.Font.load("impact.ttf", 20)
-        self.character_overlay_text_rect = pg.Rect((self.screen_rect.centerx, 200, 300, 300))
+        self.character_overlay_text_rect = self.overlay_rect
         self.character_overlay_text = tools.render_textrect(
             string,
             my_font,
@@ -489,21 +493,21 @@ class Game(states.States):
         screen.blit(self.card_help_overlay_title, self.card_help_overlay_title_rect)
         screen.blit(self.card_help_overlay_text, self.card_help_overlay_text_rect)
         sel = self.player.selected_card()
-        screen.blit(sel.surf, self.overlay_card_position)
+        screen.blit(sel.surf, (self.screen_rect.centerx - self.card_size[0] * 1.1, 200))
 
     def render_role_overlay(self, screen):
         screen.blit(self.overlay_bg, (0, 0))
         screen.blit(self.role_overlay_title, self.role_overlay_title_rect)
         screen.blit(self.role_overlay_text, self.role_overlay_text_rect)
         image = pg.transform.scale(self.player.role_image, (100 * self.scaling_factor, 100 * self.scaling_factor))
-        screen.blit(image, self.overlay_card_position)
+        screen.blit(image, (self.screen_rect.centerx - image.get_rect().width * 1.1, 200))
 
     def render_character_overlay(self, screen):
         screen.blit(self.overlay_bg, (0, 0))
         screen.blit(self.character_overlay_title, self.character_overlay_title_rect)
         screen.blit(self.character_overlay_text, self.character_overlay_text_rect)
         image = pg.transform.scale(self.player.character_image, (100 * self.scaling_factor, 100 * self.scaling_factor))
-        screen.blit(image, self.overlay_card_position)
+        screen.blit(image, (self.screen_rect.centerx - image.get_rect().width * 1.1, 200))
 
     def render_table_decks(self, screen):
         if self.deck:
