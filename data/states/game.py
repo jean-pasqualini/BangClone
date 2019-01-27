@@ -17,7 +17,7 @@ class Game(states.States):
         self.overlay_bg = pg.Surface((screen_rect.width, screen_rect.height))
         self.overlay_bg.fill(0)
         self.overlay_bg.set_alpha(200)
-        self.overlay_card_position = (100, 200)
+        self.overlay_card_position = (self.screen_rect.centerx / 4, 200)
         self.cards_database = data.data
         self.roles_database = data.roles
         self.deck = []  # only playable cards
@@ -329,7 +329,7 @@ class Game(states.States):
 
         string = self.roles_database[role]["info"]
         my_font = tools.Font.load("impact.ttf", 20)
-        self.role_overlay_text_rect = pg.Rect((400, 200, 300, 300))
+        self.role_overlay_text_rect = pg.Rect((self.screen_rect.centerx, 200, 300, 300))
         self.role_overlay_text = tools.render_textrect(
             string,
             my_font,
@@ -351,7 +351,7 @@ class Game(states.States):
 
         string = self.cards_database[character]["info"]
         my_font = tools.Font.load("impact.ttf", 20)
-        self.character_overlay_text_rect = pg.Rect((400, 200, 300, 300))
+        self.character_overlay_text_rect = pg.Rect((self.screen_rect.centerx, 200, 300, 300))
         self.character_overlay_text = tools.render_textrect(
             string,
             my_font,
