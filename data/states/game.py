@@ -525,5 +525,28 @@ class Game(states.States):
             )
 
 class GameFlow():
-    def __init__(self, players, **kwargs):
-        pass
+    def __init__(self, players):
+        self.players = players
+        self.deck = []
+        self.create_deck()
+        self.discard = []
+        self.turn = self.get_sheriff_index()
+
+    def create_deck(self):
+        """Fill shuffled deck with playable decks in specified amounts from db"""
+        path = os.path.join(tools.Image.path, "cards")
+        for root, dirs, files in os.walk(path):
+            for f in files:
+                if f.endswith(".png"):
+                    path = os.path.abspath(os.path.join(root, f))
+                    image = pg.image.load(path)
+                    filename = tools.get_filename(path)
+                    if tools.get_category(path) not in ["roles", "characters", "other"]:
+                        for i in range(data.data[filename]["max"]):
+                            self.deck.append(card.Card(path, image))
+        random.shuffle(self.deck)
+
+    def get_sheriff_index(self):
+        for player in self.players:
+            if player.role == "sheriff":
+                return self.players.index(player)

@@ -13,32 +13,27 @@ class Player:
         super().__init__()
         self.id = self.randomize_id()
         self.nickname = nickname
-        self.role = role
-        if not character:
-            self.character = self.random_character()
-        else:
-            self.character = character
         if not role:
             self.role = self.random_role()
         else:
             self.role = role
-        self.hand = None
-        self.is_hand_set = False
-        self.gun = None
-        self.active_cards = []
+        self.role_image = tools.Image.load(f"roles/{self.role}.png")
+        self.role_image_rect = self.role_image.get_rect()
+        if not character:
+            self.character = self.random_character()
+        else:
+            self.character = character
+        self.character_image = tools.Image.load(f"chars/{self.character}.png")
+        self.character_image_rect = self.character_image.get_rect()
         self.health = data.data[self.character]["life"]
         if self.role == "sheriff":
             self.health += 1
         self.alive = True
+        self.hand = None
+        self.is_hand_set = False
+        self.gun = None
         self.buffs = []
         self.curses = []
-
-        self.character_image = tools.Image.load(f"chars/{self.character}.png")
-        self.character_image_rect = self.character_image.get_rect()
-
-        self.role_image = tools.Image.load(f"roles/{self.role}.png")
-        self.role_image_rect = self.role_image.get_rect()
-
         Player.objects.append(self)
         print(f"Player name: {self.nickname}, player id: {self.id}, character: {self.character}, role: {self.role} joined game")
 
@@ -89,7 +84,7 @@ class Player:
         return random.choice(characters)
 
     def random_role(self):
-        """"""
+        """Return random filename without extension from roles folder"""
         roles = []
         path = os.path.join(tools.Image.path, "roles")
         for root, dirs, files in os.walk(path):
