@@ -4,6 +4,8 @@ import pygame as pg
 from .. import tools, card, data, player
 from ..GUI import button
 from . import states
+from PodSixNet.Channel import Channel
+
 
 
 class Game(states.States):
@@ -96,6 +98,8 @@ class Game(states.States):
             text="Equip buff",
             **button_config,
         )
+
+        ###SELF GUI####
         self.player = player.Player("Tarn")
         self.player.role_image = pg.transform.scale(self.player.role_image, (50 * self.scaling_factor,
                                                                        50 * self.scaling_factor)
@@ -119,10 +123,32 @@ class Game(states.States):
         self.bullet = pg.transform.scale(self.bullet, (15 * self.scaling_factor, 15 * self.scaling_factor))
         self.bullet_rect = self.bullet.get_rect(topleft=(25, 0))
 
+
+        ###TEMPORARY ENEMY GUI (THIS HIT WILL LOOP THROUGH ALL THE ENEMY PLAYERS})###
         #############TEMPORARY#############
-        self.player1 = player.Player("Bot1")
-        self.player2 = player.Player("Bot2")
+        self.enemy_player = player.Player("Bot1")
         #############TEMPORARY#############
+        self.enemy_player.role_image = pg.transform.scale(self.enemy_player.role_image, (20 * self.scaling_factor,
+                                                                       20 * self.scaling_factor)
+        )
+        self.enemy_player.role_image_rect = self.enemy_player.role_image.get_rect()
+        self.enemy_player.character_image = pg.transform.scale(self.enemy_player.character_image, (20 * self.scaling_factor,
+                                                                       20 * self.scaling_factor)
+        )
+        self.enemy_player.character_image_rect = self.enemy_player.character_image.get_rect()
+        self.enemy_player_role_rect = pg.Rect((self.screen_rect.left + 50 * self.scaling_factor,
+                           self.screen_rect.bottom - (self.card_size[1] / 2 * 1.05) - self.enemy_player.role_image_rect.height / 2),
+                          (self.enemy_player.role_image_rect.width, self.enemy_player.role_image_rect.height)
+        )
+        self.enemy_character_rect = pg.Rect((self.screen_rect.left + 10 * self.scaling_factor,
+                                self.screen_rect.bottom - (self.card_size[1] / 2 * 1.05) - self.enemy_player.character_image_rect.height / 2),
+                                (self.enemy_player.character_image_rect.width, self.enemy_player.character_image_rect.height)
+        )
+
+        self.bullet_enemy = tools.Image.load("bullet.png")
+        self.bullet_enemy = pg.transform.scale(self.bullet_enemy, (15 * self.scaling_factor, 15 * self.scaling_factor))
+        self.bullet_enemy_rect = self.bullet_enemy.get_rect(topleft=(25, 0))
+
 
 ################################################################################
 #######################################GAME#####################################
@@ -219,6 +245,7 @@ class Game(states.States):
             self.player.is_hand_set = True
             # TEMPORARY
             self.player.hand = self.draw_cards(7)
+            self.enemy_player.hand = self.draw_cards(7)
 
     ### SOME OF THESE WILL CALL SIMIAL PLAYER METHODS
 
@@ -296,8 +323,12 @@ class Game(states.States):
             self.update_character_overlay()
         if self.role_overlay:
             self.update_role_overlay()
-        if not self.player.hand and self.deck: # TEMPORARY
+            
+            ###TEMPORARY###
+        if not self.player.hand and self.deck:          # TEMPORARY
             self.player.hand = self.draw_cards(4) or self.draw_cards(len(self.deck))
+        if not self.enemy_player.hand and self.deck:    # TEMPORARY
+            self.enemy_player.hand = self.draw_cards(4) or self.draw_cards(len(self.deck))
 
     def update_card_overlay(self):
         filename = tools.get_filename(self.player.selected_card().path)
@@ -321,8 +352,11 @@ class Game(states.States):
             0,
         )
 
-    def update_role_overlay(self):
-        role = self.player.role
+    def update_role_overlay(self, role=None):
+        if not role:
+            role = self.player.role
+        else:
+            role = role
         self.role_overlay_title, self.role_overlay_title_rect = self.make_text(
             role.title(),
             (255, 255, 255),
@@ -343,8 +377,11 @@ class Game(states.States):
             0,
         )
 
-    def update_character_overlay(self):
-        character = self.player.character
+    def update_character_overlay(self, character=None):
+        if not character:
+            character = self.player.character
+        else:
+            character = character
         self.character_overlay_title, self.character_overlay_title_rect = self.make_text(
             character.replace("_", " ").title(),
             (255, 255, 255),
@@ -396,6 +433,10 @@ class Game(states.States):
             card.rect.x = hand_x + i * self.hand_card_bufferX
         for i, c in enumerate(move):
             c.rect.x = hand_x + self.player.hand.index(move[i]) * self.hand_card_bufferX  + self.card_size[0] * 1.1 / 2
+
+    def update_enemy_hand_position(self, player):
+        hand_width = (len(self.player.hand) + 1)
+        # TODO
 
     def update_buffs_position(self):
         buffs_width = (len(self.player.hand) + 1) * self.hand_card_bufferX
@@ -524,29 +565,12 @@ class Game(states.States):
                          )
             )
 
-class GameFlow():
-    def __init__(self, players):
-        self.players = players
-        self.deck = []
-        self.create_deck()
-        self.discard = []
-        self.turn = self.get_sheriff_index()
-
-    def create_deck(self):
-        """Fill shuffled deck with playable decks in specified amounts from db"""
-        path = os.path.join(tools.Image.path, "cards")
-        for root, dirs, files in os.walk(path):
-            for f in files:
-                if f.endswith(".png"):
-                    path = os.path.abspath(os.path.join(root, f))
-                    image = pg.image.load(path)
-                    filename = tools.get_filename(path)
-                    if tools.get_category(path) not in ["roles", "characters", "other"]:
-                        for i in range(data.data[filename]["max"]):
-                            self.deck.append(card.Card(path, image))
-        random.shuffle(self.deck)
-
-    def get_sheriff_index(self):
-        for player in self.players:
-            if player.role == "sheriff":
-                return self.players.index(player)
+class ClientChannel(Channel):
+    """Server-representation-of-a-client class.
+    Each time a client connects, a new Channel based class will be created.
+    """
+    def Network(self, data):
+        print(data)
+    
+    def Network_myaction(self, data):
+        print(f"myaction: {data}")
