@@ -151,7 +151,7 @@ class Game(states.States):
 
 
         self.button_functions = [self.card_to_discard, self.player_equip_gun, self.player_equip_buff]
-        self.visualizer = GameVisual(self.screen_rect, self.player, self.card_size, self.button_functions)
+        self.visualizer = GameVisual(self.screen_rect, self.player, self.deck, self.discard, self.button_functions)
 
 
 ################################################################################
@@ -270,21 +270,21 @@ class Game(states.States):
         if not self.card_help_overlay:
             if self.player.selected_card():
                 selected_card = self.player.selected_card()
-                self.play_card_button.check_event(event)
+                self.visualizer.play_card_button.check_event(event)
                 if tools.get_category(selected_card.path) == "guns":
-                    self.equip_gun_button.check_event(event)
+                    self.visualizer.equip_gun_button.check_event(event)
                 elif tools.get_category(selected_card.path) == "buffs":
                     buff_names = []
                     for buff in self.player.buffs:
                         buff_names.append(tools.get_filename(buff.path))
                     if tools.get_filename(selected_card.path) not in buff_names:
-                        self.equip_buff_button.check_event(event)
+                        self.visualizer.equip_buff_button.check_event(event)
 
-            if self.role_rect.collidepoint(pg.mouse.get_pos()) and not self.character_rect.collidepoint(pg.mouse.get_pos()):
+            if self.visualizer.role_rect.collidepoint(pg.mouse.get_pos()) and not self.visualizer.character_rect.collidepoint(pg.mouse.get_pos()):
                     self.role_overlay = True
             else:
                 self.role_overlay = False
-            if self.character_rect.collidepoint(pg.mouse.get_pos()):
+            if self.visualizer.character_rect.collidepoint(pg.mouse.get_pos()):
                 self.character_overlay = True
             else:
                 self.character_overlay = False
@@ -306,7 +306,7 @@ class Game(states.States):
         elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
             if not self.card_help_overlay:
                 self.check_select_deselect_card()
-            if self.help_btn_image_rect.collidepoint(pg.mouse.get_pos()):
+            if self.visualizer.help_btn_image_rect.collidepoint(pg.mouse.get_pos()):
                 if self.player.selected_card():
                     self.card_help_overlay = not self.card_help_overlay
 
@@ -316,17 +316,17 @@ class Game(states.States):
 
     def update(self, now, keys):
         self.discard_to_deck_reshuffle()
-        self.update_hand_position()
-        self.update_table_decks_pisition()
-        self.update_buffs_position()
+        self.visualizer.update_hand_position()
+        self.visualizer.update_table_decks_pisition()
+        self.visualizer.update_buffs_position()
         if not self.player.selected_card():
             card.Card.deselect_cards()
         if self.card_help_overlay:
-            self.update_card_overlay()
+            self.visualizer.update_card_overlay()
         if self.character_overlay:
-            self.update_character_overlay()
+            self.visualizer.update_character_overlay()
         if self.role_overlay:
-            self.update_role_overlay()
+            self.visualizer.update_role_overlay()
 
             ###TEMPORARY###
         if not self.player.hand and self.deck:          # TEMPORARY
@@ -454,20 +454,20 @@ class Game(states.States):
 ################################################################################
 
     def render(self, screen):
-        screen.blit(self.bg, self.bg_rect)
-        self.render_table_decks(screen)
-        self.render_gun(screen)
-        self.render_buffs(screen)
-        self.render_hand(screen)
-        self.render_role(screen)
-        self.render_character(screen)
-        self.render_health(screen)
+        screen.blit(self.visualizer.bg, self.visualizer.bg_rect)
+        self.visualizer.render_table_decks(screen)
+        self.visualizer.render_gun(screen)
+        self.visualizer.render_buffs(screen)
+        self.visualizer.render_hand(screen)
+        self.visualizer.render_role(screen)
+        self.visualizer.render_character(screen)
+        self.visualizer.render_health(screen)
         if self.card_help_overlay:
-            self.render_card_overlay(screen)
+            self.visualizer.render_card_overlay(screen)
         if self.role_overlay:
-            self.render_role_overlay(screen)
+            self.visualizer.render_role_overlay(screen)
         if self.character_overlay:
-            self.render_character_overlay(screen)
+            self.visualizer.render_character_overlay(screen)
 
     def render_health(self, screen):
         for i in range(self.player.health):
@@ -571,11 +571,21 @@ class Game(states.States):
 
 
 class GameVisual():
-    def __init__(self, screen_rect, player, card_size, button_functions):
+    def __init__(self, screen_rect, player, deck, discard, button_functions):
         self.screen_rect = screen_rect
         self.scaling_factor = int(self.screen_rect.width / 400)
         self.player = player
-        self.card_size = card_size
+        self.deck = deck
+        self.discard = discard
+        self.card_size = self.deck[0].rect.size
+        self.overlay_bg = pg.Surface((screen_rect.width, screen_rect.height))
+        self.overlay_bg.fill(0)
+        self.overlay_bg.set_alpha(200)
+        self.overlay_rect = pg.Rect((self.screen_rect.centerx * 1.1, 
+                                                    200, 
+                                                    100 * self.scaling_factor,
+                                                    100 * self.scaling_factor)
+                                                   )
         self.hand_card_bufferX = self.card_size[0] / 2
         self.player.role_image = pg.transform.scale(self.player.role_image, (50 * self.scaling_factor,
                                                                        50 * self.scaling_factor)
@@ -613,6 +623,22 @@ class GameVisual():
         )
 
         self.button_functions = button_functions
+
+        self.play_deck_x = self.screen_rect.centerx - self.card_size[0]
+        self.play_deck_y = self.screen_rect.centery - self.card_size[1] / 2
+        self.hand_card_bufferY = 10 * self.scaling_factor
+        self.bg = tools.Image.load("greenbg.png")
+        self.bg_rect = self.bg.get_rect()
+        self.help_btn_image = tools.Image.load("info.png")
+        self.help_btn_image = pg.transform.scale(self.help_btn_image, (25 * self.scaling_factor,
+                                                                       25 * self.scaling_factor)
+        )
+        self.help_btn_image_rect = self.help_btn_image.get_rect(topleft=(0, 0))
+
+        self.settings = tools.Image.load("gear.png")
+        self.settings = pg.transform.scale(self.settings, (25 * self.scaling_factor, 25 * self.scaling_factor))
+        self.settings_rect = self.settings.get_rect()
+
         button_config = {
             "hover_color": (100, 255, 100),
             "clicked_color": (255, 255, 255),
@@ -835,9 +861,9 @@ class GameVisual():
         self.equip_buff_button.rect.x = self.play_card_button.rect.right + 5
         self.equip_buff_button.rect.y = self.play_card_button.rect.y
 
-    def update_table_decks_pisition(self, deck):
-        self.deck_thickness_card.rect.y = self.play_deck_y - (0.01 * len(deck))
-        self.deck_thickness_card.rect.x = self.play_deck_x - (0.2 * len(deck))
+    def update_table_decks_pisition(self):
+        self.deck_thickness_card.rect.y = self.play_deck_y - (0.01 * len(self.deck))
+        self.deck_thickness_card.rect.x = self.play_deck_x - (0.2 * len(self.deck))
 
     def update_hand_position(self):
         """Center hand in the middle of the screen,
