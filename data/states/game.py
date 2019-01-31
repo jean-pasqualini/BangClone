@@ -1,3 +1,7 @@
+"""Represent state of actual game play table. 
+Handle updating table info, rendering everythibg to screen, 
+handling player events.
+"""
 import os
 import random
 import pygame as pg
@@ -7,9 +11,9 @@ from . import states
 from PodSixNet.Channel import Channel
 
 
-
 class Game(states.States):
-    """TODO
+    """Store play table info, players, handle events, receive updated&rendered info
+    Implement game logic.
     """
     def __init__(self, screen_rect):
         super().__init__()
@@ -20,13 +24,16 @@ class Game(states.States):
         self.create_deck()
         self.table = []
         self.discard = []
+
         self.player = player.Player("Tarn")
         self.enemy_player = player.Player("Bot1")
+
         self.button_functions = [self.card_to_discard, self.player_equip_gun, self.player_equip_buff]
         self.visualizer = GameVisualizer(self.screen_rect, self.player, self.deck, self.discard, self.button_functions)
 
     def card_to_discard(self, card=None):
-        """Remove card from it's storage and move to discard"""
+        """Remove card from it's storage (except deck) and move to discard.
+        if no card passed - discards self selected card"""
         if not card:
             card = self.player.selected_card()
         if card in self.player.hand:
@@ -39,28 +46,25 @@ class Game(states.States):
         self.button_sound.sound.play()
 
     def check_select_deselect_card(self):
-        """Check if card was selected/deselected.
+        """Check if card was hovered by mouse.
         If card is fully visible (the last one or/and selected)
-        it can be selected everywhere, otherwise only on left side of card.
+        it can be selected everywhere, otherwise only on left (visible) side of card.
         """
         for card in self.player.hand:
             half_width = int(card.rect.width / 2)
             card_left_side = card.rect.inflate(-half_width, 0)
             card_left_side.x -= int(half_width / 2)
-
             if card.selected:
                 if card.rect.collidepoint(pg.mouse.get_pos()):
                     card.selected = not card.selected
                     self.button_sound.sound.play()
                     return card
-
             elif card == self.player.hand[-1]:
                 if card.rect.collidepoint(pg.mouse.get_pos()):
                     self.player.set_all_cards_select_to_false()
                     card.selected = True
                     self.button_sound.sound.play()
                     return card
-
             else:
                 if card_left_side.collidepoint(pg.mouse.get_pos()):
                     self.player.set_all_cards_select_to_false()
@@ -167,10 +171,12 @@ class Game(states.States):
                     self.visualizer.card_help_overlay = not self.visualizer.card_help_overlay
 
     def update(self, now, keys):
+        """Recalculate all needed information for render and game status"""
         self.discard_to_deck_reshuffle()
         self.visualizer.update_hand_position()
         self.visualizer.update_table_decks_pisition()
         self.visualizer.update_buffs_position()
+        # deselect card if player used it somehow
         if not self.player.selected_card():
             card.Card.deselect_cards()
         if self.visualizer.card_help_overlay:
@@ -182,12 +188,13 @@ class Game(states.States):
 
             ###TEMPORARY###
         if not self.player.hand and self.deck:          # TEMPORARY
-            self.player.hand = self.draw_cards(4) or self.draw_cards(len(self.deck))
+            self.player.hand = self.draw_cards(5) or self.draw_cards(len(self.deck))
         if not self.enemy_player.hand and self.deck:    # TEMPORARY
-            self.enemy_player.hand = self.draw_cards(4) or self.draw_cards(len(self.deck))
+            self.enemy_player.hand = self.draw_cards(5) or self.draw_cards(len(self.deck))
 
 
     def render(self, screen):
+        """Show everything needed on screen in particular order"""
         screen.blit(self.visualizer.bg, self.visualizer.bg_rect)
         self.visualizer.render_table_decks(screen)
         self.visualizer.render_gun(screen)
@@ -313,6 +320,7 @@ class GameVisualizer(states.States):
 
     # RENDER
     def render_health(self, screen):
+        """Show player health as bullet pictures above role image"""
         for i in range(self.player.health):
             screen.blit(self.bullet,
                     (8 * self.scaling_factor + self.screen_rect.left + self.scaling_factor * i * 18,
@@ -320,6 +328,7 @@ class GameVisualizer(states.States):
         )
 
     def render_gun(self, screen):
+        """Render gun placeholder and gun over it if present"""
         screen.blit(self.gun_placeholder_card.surf,
                     (self.screen_rect.width - self.card_size[0] - self.scaling_factor,
                      self.screen_rect.bottom - self.card_size[1] * 1.05)
@@ -331,18 +340,22 @@ class GameVisualizer(states.States):
             )
 
     def render_role(self, screen):
+        """Show circled image of player's role shifted to the right under character image"""
         screen.blit(self.player.role_image,
                     (self.screen_rect.left + 50 * self.scaling_factor,
                      self.screen_rect.bottom - (self.card_size[1] / 2 * 1.05) - self.player.role_image_rect.height / 2)
         )
 
     def render_character(self, screen):
+        """Show image of player's character shifted to the left on top of role image"""
         screen.blit(self.player.character_image,
                     (self.screen_rect.left + 10 * self.scaling_factor,
                      self.screen_rect.bottom - (self.card_size[1] / 2 * 1.05) - self.player.character_image_rect.height / 2)
         )
 
     def render_hand(self, screen):
+        """Show hand cards one by one overlaying each other with step of half card size.
+        Show play buttons on top of selected card if present."""
         c = None
         for card in self.player.hand:
             if card.selected:
@@ -354,6 +367,7 @@ class GameVisualizer(states.States):
         self.render_play_buttons(screen)
 
     def render_buffs(self, screen):
+        """show little part of buff cards under player's hand"""
         for card in self.player.buffs:
             screen.blit(card.surf, (card.rect.x, card.rect.y))
 
