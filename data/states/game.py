@@ -150,6 +150,10 @@ class Game(states.States):
         self.bullet_enemy_rect = self.bullet_enemy.get_rect(topleft=(25, 0))
 
 
+        self.button_functions = [self.card_to_discard, self.player_equip_gun, self.player_equip_buff]
+        self.visualizer = GameVisual(self.screen_rect, self.player, self.card_size, self.button_functions)
+
+
 ################################################################################
 #######################################GAME#####################################
 ################################################################################
@@ -572,6 +576,7 @@ class GameVisual():
         self.scaling_factor = int(self.screen_rect.width / 400)
         self.player = player
         self.card_size = card_size
+        self.hand_card_bufferX = self.card_size[0] / 2
         self.player.role_image = pg.transform.scale(self.player.role_image, (50 * self.scaling_factor,
                                                                        50 * self.scaling_factor)
         )
@@ -641,6 +646,9 @@ class GameVisual():
             text="Equip buff",
             **button_config,
         )
+
+
+    # RENDER
 
     def render_health(self, screen):
         for i in range(self.player.health):
@@ -742,6 +750,121 @@ class GameVisual():
                          )
             )
 
+    # UPDATE
+    def update_card_overlay(self):
+        filename = tools.get_filename(self.player.selected_card().path)
+        self.card_help_overlay_title, self.card_help_overlay_title_rect = self.make_text(
+            filename.title(),
+            (255, 255, 255),
+            (self.screen_rect.centerx, 100),
+            60,
+            fonttype="impact.ttf",
+        )
+
+        string = data.data[filename]["info"]
+        my_font = tools.Font.load("impact.ttf", 20)
+        self.card_help_overlay_text_rect = self.overlay_rect
+        self.card_help_overlay_text = tools.render_textrect(
+            string,
+            my_font,
+            self.card_help_overlay_text_rect,
+            (216, 216, 216),
+            (48, 48, 48, 255),
+            0,
+        )
+
+    def update_role_overlay(self, role=None):
+        if not role:
+            role = self.player.role
+        else:
+            role = role
+        self.role_overlay_title, self.role_overlay_title_rect = self.make_text(
+            role.title(),
+            (255, 255, 255),
+            (self.screen_rect.centerx, 100),
+            60,
+            fonttype="impact.ttf",
+        )
+
+        string = data.roles[role]["info"]
+        my_font = tools.Font.load("impact.ttf", 20)
+        self.role_overlay_text_rect = self.overlay_rect
+        self.role_overlay_text = tools.render_textrect(
+            string,
+            my_font,
+            self.role_overlay_text_rect,
+            (216, 216, 216),
+            (48, 48, 48, 255),
+            0,
+        )
+
+    def update_character_overlay(self, character=None):
+        if not character:
+            character = self.player.character
+        else:
+            character = character
+        self.character_overlay_title, self.character_overlay_title_rect = self.make_text(
+            character.replace("_", " ").title(),
+            (255, 255, 255),
+            (self.screen_rect.centerx, 100),
+            60,
+            fonttype="impact.ttf",
+        )
+
+        string = data.data[character]["info"]
+        my_font = tools.Font.load("impact.ttf", 20)
+        self.character_overlay_text_rect = self.overlay_rect
+        self.character_overlay_text = tools.render_textrect(
+            string,
+            my_font,
+            self.character_overlay_text_rect,
+            (216, 216, 216),
+            (48, 48, 48, 255),
+            0,
+        )
+
+    def reposition_card_buttons(self):
+        """Place buttons on top of the selected card"""
+        self.play_card_button.rect.center = self.player.selected_card().rect.center
+        self.play_card_button.rect.y -= (self.card_size[1] / 2
+                                        + self.play_button_height/2
+                                        + 2 * self.scaling_factor
+                                        )
+        self.equip_gun_button.rect.x = self.play_card_button.rect.right + 5
+        self.equip_gun_button.rect.y = self.play_card_button.rect.y
+        self.equip_buff_button.rect.x = self.play_card_button.rect.right + 5
+        self.equip_buff_button.rect.y = self.play_card_button.rect.y
+
+    def update_table_decks_pisition(self, deck):
+        self.deck_thickness_card.rect.y = self.play_deck_y - (0.01 * len(deck))
+        self.deck_thickness_card.rect.x = self.play_deck_x - (0.2 * len(deck))
+
+    def update_hand_position(self):
+        """Center hand in the middle of the screen,
+        shift all cards after selected to make it fully visible.
+        """
+        move = []
+        hand_width = (len(self.player.hand) + 1) * self.hand_card_bufferX
+        hand_x = self.screen_rect.centerx - hand_width / 2
+        for i, card in enumerate(self.player.hand):
+            card.rect.y = self.screen_rect.bottom - card.surf.get_height() * 1.05
+            if card.selected:
+                card.rect.y -= self.hand_card_bufferY
+                move = self.player.hand[i+1:]
+            card.rect.x = hand_x + i * self.hand_card_bufferX
+        for i, c in enumerate(move):
+            c.rect.x = hand_x + self.player.hand.index(move[i]) * self.hand_card_bufferX  + self.card_size[0] * 1.1 / 2
+
+    def update_enemy_hand_position(self, player):
+        hand_width = (len(self.player.hand) + 1)
+        # TODO
+
+    def update_buffs_position(self):
+        buffs_width = (len(self.player.hand) + 1) * self.hand_card_bufferX
+        buffs_x = self.screen_rect.centerx - buffs_width / 2
+        for i, card in enumerate(self.player.buffs):
+            card.rect.y = self.screen_rect.bottom - card.surf.get_height() * 1.25
+            card.rect.x = buffs_x + i * self.hand_card_bufferX
 
 class ClientChannel(Channel):
     """Server-representation-of-a-client class.
