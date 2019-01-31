@@ -20,9 +20,6 @@ class Game(states.States):
         self.create_deck()
         self.table = []
         self.discard = []
-        self.card_help_overlay = False
-        self.character_overlay = False
-        self.role_overlay = False
         self.player = player.Player("Tarn")
         self.enemy_player = player.Player("Bot1")
         self.button_functions = [self.card_to_discard, self.player_equip_gun, self.player_equip_buff]
@@ -126,7 +123,7 @@ class Game(states.States):
 ################################################################################
 
     def get_event(self, event, keys):
-        if not self.card_help_overlay:
+        if not self.visualizer.card_help_overlay:
             if self.player.selected_card():
                 selected_card = self.player.selected_card()
                 self.visualizer.play_card_button.check_event(event)
@@ -140,34 +137,34 @@ class Game(states.States):
                         self.visualizer.equip_buff_button.check_event(event)
 
             if self.visualizer.role_rect.collidepoint(pg.mouse.get_pos()) and not self.visualizer.character_rect.collidepoint(pg.mouse.get_pos()):
-                    self.role_overlay = True
+                    self.visualizer.role_overlay = True
             else:
-                self.role_overlay = False
+                self.visualizer.role_overlay = False
             if self.visualizer.character_rect.collidepoint(pg.mouse.get_pos()):
-                self.character_overlay = True
+                self.visualizer.character_overlay = True
             else:
-                self.character_overlay = False
+                self.visualizer.character_overlay = False
 
         if event.type == pg.QUIT:
             self.quit = True
         elif event.type == pg.KEYDOWN:
             if event.key == self.keybinding["back"]:
-                if not self.card_help_overlay:
+                if not self.visualizer.card_help_overlay:
                     self.button_sound.sound.play()
                     self.done = True
                     self.next = "MENU"
                 else:
-                    self.card_help_overlay = not self.card_help_overlay
+                    self.visualizer.card_help_overlay = not self.visualizer.card_help_overlay
 
         elif event.type == self.background_music.track_end:
             self.play_next_track()
 
         elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-            if not self.card_help_overlay:
+            if not self.visualizer.card_help_overlay:
                 self.check_select_deselect_card()
             if self.visualizer.help_btn_image_rect.collidepoint(pg.mouse.get_pos()):
                 if self.player.selected_card():
-                    self.card_help_overlay = not self.card_help_overlay
+                    self.visualizer.card_help_overlay = not self.visualizer.card_help_overlay
 
     def update(self, now, keys):
         self.discard_to_deck_reshuffle()
@@ -176,11 +173,11 @@ class Game(states.States):
         self.visualizer.update_buffs_position()
         if not self.player.selected_card():
             card.Card.deselect_cards()
-        if self.card_help_overlay:
+        if self.visualizer.card_help_overlay:
             self.visualizer.update_card_overlay()
-        if self.character_overlay:
+        if self.visualizer.character_overlay:
             self.visualizer.update_character_overlay()
-        if self.role_overlay:
+        if self.visualizer.role_overlay:
             self.visualizer.update_role_overlay()
 
             ###TEMPORARY###
@@ -199,11 +196,11 @@ class Game(states.States):
         self.visualizer.render_role(screen)
         self.visualizer.render_character(screen)
         self.visualizer.render_health(screen)
-        if self.card_help_overlay:
+        if self.visualizer.card_help_overlay:
             self.visualizer.render_card_overlay(screen)
-        if self.role_overlay:
+        if self.visualizer.role_overlay:
             self.visualizer.render_role_overlay(screen)
-        if self.character_overlay:
+        if self.visualizer.character_overlay:
             self.visualizer.render_character_overlay(screen)
 
 
@@ -216,6 +213,9 @@ class GameVisualizer(states.States):
         self.deck = deck
         self.discard = discard
         self.card_size = self.deck[0].rect.size
+        self.card_help_overlay = False
+        self.character_overlay = False
+        self.role_overlay = False
         self.overlay_bg = pg.Surface((screen_rect.width, screen_rect.height))
         self.overlay_bg.fill(0)
         self.overlay_bg.set_alpha(200)
