@@ -41,7 +41,7 @@ class Game(states.States):
             self.thickness_path, pg.image.load(self.thickness_path), self.screen_rect
         )
         self.gun_placeholder_card = card.Card(
-            self.thickness_path, pg.image.load(self.gun_placeholder_path), self.screen_rect
+            self.gun_placeholder_path, pg.image.load(self.gun_placeholder_path), self.screen_rect
         )
         self.bg_color = (255, 255, 255)
         self.card_help_overlay = False
@@ -203,7 +203,7 @@ class Game(states.States):
         self.deck = self.deck[:-N]
         return drawn
 
-    def discard_to_deck(self):
+    def discard_to_deck_reshuffle(self):
         """Pass reshuffled discard deck to play deck,
         leave last card in discard
         """
@@ -311,7 +311,7 @@ class Game(states.States):
 ################################################################################
 
     def update(self, now, keys):
-        self.discard_to_deck()
+        self.discard_to_deck_reshuffle()
         self.update_hand_position()
         self.update_table_decks_pisition()
         self.update_buffs_position()
@@ -323,7 +323,7 @@ class Game(states.States):
             self.update_character_overlay()
         if self.role_overlay:
             self.update_role_overlay()
-            
+
             ###TEMPORARY###
         if not self.player.hand and self.deck:          # TEMPORARY
             self.player.hand = self.draw_cards(4) or self.draw_cards(len(self.deck))
@@ -564,6 +564,184 @@ class Game(states.States):
                          self.play_deck_y
                          )
             )
+
+
+class GameVisual():
+    def __init__(self, screen_rect, player, card_size, button_functions):
+        self.screen_rect = screen_rect
+        self.scaling_factor = int(self.screen_rect.width / 400)
+        self.player = player
+        self.card_size = card_size
+        self.player.role_image = pg.transform.scale(self.player.role_image, (50 * self.scaling_factor,
+                                                                       50 * self.scaling_factor)
+        )
+        self.player.role_image_rect = self.player.role_image.get_rect()
+        self.player.character_image = pg.transform.scale(self.player.character_image, (60 * self.scaling_factor,
+                                                                       60 * self.scaling_factor)
+        )
+        self.player.character_image_rect = self.player.character_image.get_rect()
+
+        self.role_rect = pg.Rect((self.screen_rect.left + 50 * self.scaling_factor,
+                           self.screen_rect.bottom - (self.card_size[1] / 2 * 1.05) - self.player.role_image_rect.height / 2),
+                          (self.player.role_image_rect.width, self.player.role_image_rect.height)
+        )
+        self.character_rect = pg.Rect((self.screen_rect.left + 10 * self.scaling_factor,
+                                self.screen_rect.bottom - (self.card_size[1] / 2 * 1.05) - self.player.character_image_rect.height / 2),
+                                (self.player.character_image_rect.width, self.player.character_image_rect.height)
+        )
+
+        self.bullet = tools.Image.load("bullet.png")
+        self.bullet = pg.transform.scale(self.bullet, (15 * self.scaling_factor, 15 * self.scaling_factor))
+        self.bullet_rect = self.bullet.get_rect(topleft=(25, 0))
+
+        backend_path = os.path.join(tools.Image.path, "cards/other/backend.png")
+        thickness_path = os.path.join(tools.Image.path, "cards/other/deck_thickness.png")
+        gun_placeholder_path = os.path.join(tools.Image.path, "cards/other/gun_placeholder.png")
+        self.backend_card = card.Card(
+            backend_path, pg.image.load(backend_path), self.screen_rect
+        )
+        self.deck_thickness_card = card.Card(
+            thickness_path, pg.image.load(thickness_path), self.screen_rect
+        )
+        self.gun_placeholder_card = card.Card(
+            gun_placeholder_path, pg.image.load(gun_placeholder_path), self.screen_rect
+        )
+
+        self.button_functions = button_functions
+        button_config = {
+            "hover_color": (100, 255, 100),
+            "clicked_color": (255, 255, 255),
+            "clicked_font_color": (0, 0, 0),
+            "hover_font_color": (0, 0, 0),
+            "font": tools.Font.load("impact.ttf", 8 * self.scaling_factor),
+            "font_color": (0, 0, 0),
+            "call_on_release": False,
+        }
+
+        self.play_button_width =  40 * self.scaling_factor
+        self.play_button_height = 15 * self.scaling_factor
+        self.play_card_button = button.Button(
+            (0, 0, self.play_button_width, self.play_button_height),
+            (100, 200, 100),
+            self.button_functions[0],
+            text="Play Card",
+            **button_config,
+        )
+        self.equip_gun_button = button.Button(
+            (0, 0, self.play_button_width, self.play_button_height),
+            (100, 200, 100),
+            self.button_functions[1],
+            text="Equip gun",
+            **button_config,
+        )
+        self.equip_buff_button = button.Button(
+            (0, 0, self.play_button_width, self.play_button_height),
+            (100, 200, 100),
+            self.button_functions[2],
+            text="Equip buff",
+            **button_config,
+        )
+
+    def render_health(self, screen):
+        for i in range(self.player.health):
+            screen.blit(self.bullet,
+                    (8 * self.scaling_factor + self.screen_rect.left + self.scaling_factor * i * 18,
+                     self.screen_rect.bottom - self.player.role_image_rect.height * 1.65)
+        )
+
+    def render_gun(self, screen):
+        screen.blit(self.gun_placeholder_card.surf,
+                    (self.screen_rect.width - self.card_size[0] - self.scaling_factor,
+                     self.screen_rect.bottom - self.card_size[1] * 1.05)
+        )
+        if self.player.gun:
+            screen.blit(self.player.gun.surf,
+                        (self.screen_rect.width - self.card_size[0] - self.scaling_factor,
+                         self.screen_rect.bottom - self.card_size[1] * 1.05)
+            )
+
+    def render_role(self, screen):
+        screen.blit(self.player.role_image,
+                    (self.screen_rect.left + 50 * self.scaling_factor,
+                     self.screen_rect.bottom - (self.card_size[1] / 2 * 1.05) - self.player.role_image_rect.height / 2)
+        )
+
+    def render_character(self, screen):
+        screen.blit(self.player.character_image,
+                    (self.screen_rect.left + 10 * self.scaling_factor,
+                     self.screen_rect.bottom - (self.card_size[1] / 2 * 1.05) - self.player.character_image_rect.height / 2)
+        )
+
+    def render_hand(self, screen):
+        c = None
+        for card in self.player.hand:
+            if card.selected:
+                c = card
+            else:
+                screen.blit(card.surf, (card.rect.x, card.rect.y))
+        if c:
+            screen.blit(c.surf, (c.rect.x, c.rect.y))
+        self.render_play_buttons(screen)
+
+    def render_buffs(self, screen):
+        for card in self.player.buffs:
+            screen.blit(card.surf, (card.rect.x, card.rect.y))
+
+    def render_play_buttons(self, screen):
+        """Render play buttons on top of the selected card.
+        Equip gun button for guns
+        Equip buff button for buffs which are not applied already
+        Play Card for all cards (TEMPORARY)
+        """
+        if self.player.selected_card():
+            self.reposition_card_buttons()
+            self.play_card_button.render(screen)
+            if tools.get_category(self.player.selected_card().path) == "guns":
+                self.equip_gun_button.render(screen)
+            elif tools.get_category(self.player.selected_card().path) == "buffs":
+                buff_names = []
+                for buff in self.player.buffs:
+                    buff_names.append(tools.get_filename(buff.path))
+                if tools.get_filename(self.player.selected_card().path) not in buff_names:
+                    self.equip_buff_button.render(screen)
+            screen.blit(self.help_btn_image, self.help_btn_image_rect)
+
+    def render_card_overlay(self, screen):
+        screen.blit(self.overlay_bg, (0, 0))
+        screen.blit(self.card_help_overlay_title, self.card_help_overlay_title_rect)
+        screen.blit(self.card_help_overlay_text, self.card_help_overlay_text_rect)
+        sel = self.player.selected_card()
+        screen.blit(sel.surf, (self.screen_rect.centerx - self.card_size[0] * 1.1, 200))
+
+    def render_role_overlay(self, screen):
+        screen.blit(self.overlay_bg, (0, 0))
+        screen.blit(self.role_overlay_title, self.role_overlay_title_rect)
+        screen.blit(self.role_overlay_text, self.role_overlay_text_rect)
+        image = pg.transform.scale(self.player.role_image, (100 * self.scaling_factor, 100 * self.scaling_factor))
+        screen.blit(image, (self.screen_rect.centerx - image.get_rect().width * 1.1, 200))
+
+    def render_character_overlay(self, screen):
+        screen.blit(self.overlay_bg, (0, 0))
+        screen.blit(self.character_overlay_title, self.character_overlay_title_rect)
+        screen.blit(self.character_overlay_text, self.character_overlay_text_rect)
+        image = pg.transform.scale(self.player.character_image, (100 * self.scaling_factor, 100 * self.scaling_factor))
+        screen.blit(image, (self.screen_rect.centerx - image.get_rect().width * 1.1, 200))
+
+    def render_table_decks(self, screen):
+        if self.deck:
+            screen.blit(
+                self.deck_thickness_card.surf,
+                (self.deck_thickness_card.rect.x, self.deck_thickness_card.rect.y),
+            )
+
+            screen.blit(self.backend_card.surf, (self.play_deck_x, self.play_deck_y))
+        if self.discard:
+            screen.blit(self.discard[-1].surf,
+                        (self.play_deck_x + self.card_size[0] * 1.1,
+                         self.play_deck_y
+                         )
+            )
+
 
 class ClientChannel(Channel):
     """Server-representation-of-a-client class.
