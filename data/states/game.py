@@ -116,11 +116,12 @@ class Game(states.States):
         pass
 
     def entry(self):
-        if not self.player.is_hand_set:
-            self.player.is_hand_set = True
+        # if not self.player.is_hand_set:
+            # self.player.is_hand_set = True
             # TEMPORARY
-            self.player.hand = self.draw_cards(7)
-            self.enemy_player.hand = self.draw_cards(7)
+        self.player.hand = self.draw_cards(7)
+        self.enemy_player.hand = self.draw_cards(7)
+        print(self.enemy_player.hand)
 
 ################################################################################
 ##################################_MAIN_METHODS_################################

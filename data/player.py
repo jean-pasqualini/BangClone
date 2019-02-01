@@ -34,6 +34,7 @@ class Player:
         self.gun = None
         self.buffs = []
         self.curses = []
+        self.turn = False
         Player.objects.append(self)
         print(f"Player name: {self.nickname}, player id: {self.id}, character: {self.character}, role: {self.role} joined game")
 
