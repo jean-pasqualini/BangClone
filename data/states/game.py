@@ -39,7 +39,8 @@ class Game(states.States, ConnectionListener):
 
     def card_to_discard(self, card=None):
         """Remove card from it's storage (except deck) and move to discard.
-        if no card passed - discards self selected card"""
+        if no card passed - discards self selected card
+        """
         if not card:
             card = self.player.selected_card()
         if card in self.player.hand:
@@ -179,9 +180,10 @@ class Game(states.States, ConnectionListener):
                     self.visualizer.card_help_overlay = not self.visualizer.card_help_overlay
 
     def update(self, now, keys):
+        """Recalculate all needed information for render and game status"""
+        # Get info from server first
         connection.Pump()
         self.Pump()
-        """Recalculate all needed information for render and game status"""
         self.discard_to_deck_reshuffle()
         self.visualizer.update_hand_position()
         self.visualizer.update_table_decks_pisition()

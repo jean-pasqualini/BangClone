@@ -24,4 +24,7 @@ screen size
 
     python game.py -s 1280 720
     
+### Server:
+
+	python server.py
 
