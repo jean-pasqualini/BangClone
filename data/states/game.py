@@ -8,15 +8,15 @@ import pygame as pg
 from .. import tools, card, data, player
 from ..GUI import button
 from . import states
-from PodSixNet.Channel import Channel
+from PodSixNet.Connection import connection, ConnectionListener
 
 
-class Game(states.States):
+class Game(states.States, ConnectionListener):
     """Store play table info, players, handle events, receive updated&rendered info
     Implement game logic.
     """
     def __init__(self, screen_rect):
-        super().__init__()
+        states.States.__init__(self)
         self.screen_rect = screen_rect
         self.cards_database = data.data
         self.roles_database = data.roles
@@ -24,12 +24,18 @@ class Game(states.States):
         self.create_deck()
         self.table = []
         self.discard = []
-
+        self.connected = False
         self.player = player.Player("Tarn")
-        self.enemy_player = player.Player("Bot1")
+        # self.enemy_player = player.Player("Bot1")
 
         self.button_functions = [self.card_to_discard, self.player_equip_gun, self.player_equip_buff]
         self.visualizer = GameVisualizer(self.screen_rect, self.player, self.deck, self.discard, self.button_functions)
+
+        self.Connect(('localhost', 1337))
+        connection.Send({"player": self.player.id})
+
+    def Network_hello(self, data):
+        print(data["message"])
 
     def card_to_discard(self, card=None):
         """Remove card from it's storage (except deck) and move to discard.
@@ -44,6 +50,7 @@ class Game(states.States):
             self.discard.append(card)
         self.discard.append(card)
         self.button_sound.sound.play()
+        connection.Send({"action": "card", "card": card.path})
 
     def check_select_deselect_card(self):
         """Check if card was hovered by mouse.
@@ -120,8 +127,8 @@ class Game(states.States):
             # self.player.is_hand_set = True
             # TEMPORARY
         self.player.hand = self.draw_cards(7)
-        self.enemy_player.hand = self.draw_cards(7)
-        print(self.enemy_player.hand)
+        # self.enemy_player.hand = self.draw_cards(7)
+        # print(self.enemy_player.hand)
 
 ################################################################################
 ##################################_MAIN_METHODS_################################
@@ -172,6 +179,8 @@ class Game(states.States):
                     self.visualizer.card_help_overlay = not self.visualizer.card_help_overlay
 
     def update(self, now, keys):
+        connection.Pump()
+        self.Pump()
         """Recalculate all needed information for render and game status"""
         self.discard_to_deck_reshuffle()
         self.visualizer.update_hand_position()
@@ -190,8 +199,8 @@ class Game(states.States):
             ###TEMPORARY###
         if not self.player.hand and self.deck:          # TEMPORARY
             self.player.hand = self.draw_cards(5) or self.draw_cards(len(self.deck))
-        if not self.enemy_player.hand and self.deck:    # TEMPORARY
-            self.enemy_player.hand = self.draw_cards(5) or self.draw_cards(len(self.deck))
+        # if not self.enemy_player.hand and self.deck:    # TEMPORARY
+            # self.enemy_player.hand = self.draw_cards(5) or self.draw_cards(len(self.deck))
 
 
     def render(self, screen):
@@ -542,13 +551,3 @@ class GameVisualizer(states.States):
         for i, card in enumerate(self.player.buffs):
             card.rect.y = self.screen_rect.bottom - card.surf.get_height() * 1.25
             card.rect.x = buffs_x + i * self.hand_card_bufferX
-
-class ClientChannel(Channel):
-    """Server-representation-of-a-client class.
-    Each time a client connects, a new Channel based class will be created.
-    """
-    def Network(self, data):
-        print(data)
-    
-    def Network_myaction(self, data):
-        print(f"myaction: {data}")

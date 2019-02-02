@@ -1,37 +1,39 @@
 from PodSixNet.Channel import Channel
 from PodSixNet.Server import Server
-from time import sleep
+import time, math
 
 
 class ClientChannel(Channel):
-	"""Server-representation-of-a-client.
-	Each time a client connects, a new Channel based class will be created.
-	"""
     def Network(self, data):
-    	"""Whenever the client does connection.Send(mydata), 
-    	this method will be called.
-    	"""
         print(data)
 
-    # will only be called if your data has a key called ‘action’, 
-    # with a value of “Network_%methodname%”
-    def Network_update_player(self, data):
-        print(f"update_player: {data}")
-
-    def Network_update_table(self, data):
-        print(f"update_table: {data}")
+    def Network_card(self, data):
+        print(f"card: {data['card']}")
 
 class GameServer(Server):
-
+    """"""
     channelClass = ClientChannel
 
-    def Connected(self, channel, addr):
-    	"""This method will be called whenever 
-    	a new client connects to the server.
-    	"""
-        print(f"new connection: {channel}")
+    def __init__(self, *args, **kwargs):
+        super().__init__(self, *args, **kwargs)
+        print('Server launched')
 
-gameserver = GameServer()
+    def Connected(self, channel, addr):
+        """This method will be called whenever 
+        a new client connects to the server.
+        """
+        print("somebody connected")
+        channel.Send({"action": "hello", "message": "hello client!"})
+
+
+gameserver = GameServer(localaddr=('localhost', 1337))
+start = time.time()
 while True:
     gameserver.Pump()
-    sleep(0.0001)
+    time.sleep(0.0001)
+    # run your code
+    end = time.time()   
+    elapsed = end - start
+    if elapsed > 3:
+        start = time.time()
+        print(f"Server working {time.strftime('%a, %d %b %Y %X +0000', time.gmtime())}")
