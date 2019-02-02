@@ -12,19 +12,18 @@ class ClientChannel(Channel):
 
 class GameServer(Server):
     """"""
-    channelClass = ClientChannel
+    channelClass = ClientChannel 
 
     def __init__(self, *args, **kwargs):
-        super().__init__(self, *args, **kwargs)
+        Server.__init__(self, *args, **kwargs)
         print('Server launched')
 
     def Connected(self, channel, addr):
         """This method will be called whenever 
         a new client connects to the server.
         """
-        print("somebody connected")
+        print(f"somebody connected: {addr}, {channel}")
         channel.Send({"action": "hello", "message": "hello client!"})
-
 
 gameserver = GameServer(localaddr=('localhost', 1337))
 start = time.time()
