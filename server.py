@@ -1,6 +1,8 @@
+import time
+import pickle
 from PodSixNet.Channel import Channel
 from PodSixNet.Server import Server
-import time
+from data.player import Player
 
 
 class ClientChannel(Channel):
@@ -40,7 +42,7 @@ class GameServer(Server):
         channel.Send({"action": "hello", "message": "hello client!"})
 
 if __name__ == "__main__":
-    gameserver = GameServer(localaddr=('localhost', 1337))
+    gameserver = GameServer(localaddr=('0.0.0.0', 1337))
     while True:
         gameserver.Pump()
         gameserver.print_status(3)

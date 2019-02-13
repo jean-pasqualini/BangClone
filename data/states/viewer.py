@@ -65,7 +65,7 @@ class Viewer(states.States):
                 if f.endswith(".png"):
                     path = os.path.abspath(os.path.join(root, f))
                     image = pg.image.load(path)
-                    card = Card(path, image)
+                    card = Card(path)
                     if tools.get_category(card.path) != "other":
                         self.cards.append(card)
 

@@ -5,10 +5,11 @@ handling player events.
 import os
 import random
 import pygame as pg
+import pickle
+from PodSixNet.Connection import connection, ConnectionListener
 from .. import tools, card, data, player
 from ..GUI import button
 from . import states
-from PodSixNet.Connection import connection, ConnectionListener
 
 
 class Game(states.States, ConnectionListener):
@@ -26,8 +27,6 @@ class Game(states.States, ConnectionListener):
         self.discard = []
         self.connected = False
         self.player = player.Player("Tarn")
-        # self.enemy_player = player.Player("Bot1")
-
         self.button_functions = [self.card_to_discard, self.player_equip_gun, self.player_equip_buff]
         self.visualizer = GameVisualizer(self.screen_rect, self.player, self.deck, self.discard, self.button_functions)
 
@@ -106,7 +105,7 @@ class Game(states.States, ConnectionListener):
                     filename = tools.get_filename(path)
                     if tools.get_category(path) not in ["roles", "characters", "other"]:
                         for i in range(self.cards_database[filename]["max"]):
-                            self.deck.append(card.Card(path, image, self.screen_rect))
+                            self.deck.append(card.Card(path, self.screen_rect))
         random.shuffle(self.deck)
 
     def player_equip_gun(self):
@@ -269,15 +268,9 @@ class GameVisualizer(states.States):
         backend_path = os.path.join(tools.Image.path, "cards/other/backend.png")
         thickness_path = os.path.join(tools.Image.path, "cards/other/deck_thickness.png")
         gun_placeholder_path = os.path.join(tools.Image.path, "cards/other/gun_placeholder.png")
-        self.backend_card = card.Card(
-            backend_path, pg.image.load(backend_path), self.screen_rect
-        )
-        self.deck_thickness_card = card.Card(
-            thickness_path, pg.image.load(thickness_path), self.screen_rect
-        )
-        self.gun_placeholder_card = card.Card(
-            gun_placeholder_path, pg.image.load(gun_placeholder_path), self.screen_rect
-        )
+        self.backend_card = card.Card(backend_path, self.screen_rect)
+        self.deck_thickness_card = card.Card(thickness_path, self.screen_rect)
+        self.gun_placeholder_card = card.Card(gun_placeholder_path, self.screen_rect)
 
         self.button_functions = button_functions
 

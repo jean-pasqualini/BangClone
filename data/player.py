@@ -1,8 +1,8 @@
 import random
 import os
 import string
-from . import tools, data
 import pygame as pg
+from . import tools, data
 
 class Player:
     """Class responsible for storing player specific data,
