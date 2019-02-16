@@ -6,7 +6,7 @@ import data.tools
 import argparse
 import sys
 
-parser = argparse.ArgumentParser(description="Boom Arguments")
+parser = argparse.ArgumentParser(description="Bang Arguments")
 parser.add_argument(
     "-c",
     "--clean",

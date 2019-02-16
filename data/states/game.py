@@ -5,7 +5,7 @@ handling player events.
 import os
 import random
 import pygame as pg
-import pickle
+import json
 from PodSixNet.Connection import connection, ConnectionListener
 from .. import tools, card, data, player
 from ..GUI import button
@@ -36,6 +36,14 @@ class Game(states.States, ConnectionListener):
     def Network_hello(self, data):
         print(data["message"])
 
+    def send_cards(self, deck):
+        """Send JSONed self.deck to server"""
+        data = []
+        for card in deck:
+            data.append(card.path)
+        string = json.dumps(data)
+        connection.Send({"action": "deck", "cards": string})
+
     def card_to_discard(self, card=None):
         """Remove card from it's storage (except deck) and move to discard.
         if no card passed - discards self selected card
@@ -50,7 +58,6 @@ class Game(states.States, ConnectionListener):
             self.discard.append(card)
         self.discard.append(card)
         self.button_sound.sound.play()
-        connection.Send({"action": "card", "card": card.path})
 
     def check_select_deselect_card(self):
         """Check if card was hovered by mouse.
@@ -202,7 +209,6 @@ class Game(states.States, ConnectionListener):
             self.player.hand = self.draw_cards(5) or self.draw_cards(len(self.deck))
         # if not self.enemy_player.hand and self.deck:    # TEMPORARY
             # self.enemy_player.hand = self.draw_cards(5) or self.draw_cards(len(self.deck))
-
 
     def render(self, screen):
         """Show everything needed on screen in particular order"""
