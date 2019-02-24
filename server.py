@@ -1,10 +1,12 @@
 import time
 import json
+import os
+import random
+import pygame as pg
 from PodSixNet.Channel import Channel
 from PodSixNet.Server import Server
 from data.player import Player
-from data.card import Card
-from data.tools import get_filename
+from data import tools, card, data, player
 
 
 class ClientChannel(Channel):
@@ -22,10 +24,8 @@ class ClientChannel(Channel):
         deck = json.loads(data["cards"])
         server_deck = []
         for path in deck:
-            server_deck.append(Card(path))
-        self._server.deck = server_deck
+            server_deck.append(card.Card(path))
         self._server.print_cards()
-
 
 class GameServer(Server):
     """Receive and send data to players"""
@@ -39,6 +39,7 @@ class GameServer(Server):
         print('Server launched')
         self.deck = []
         self.discard = []
+        self.game = GameState()
 
     def Connected(self, channel, addr):
         """This method will be called whenever 
@@ -56,12 +57,36 @@ class GameServer(Server):
             print(f"Server working {time.strftime('%a, %d %b %Y %X +0000', time.gmtime())}")
 
     def print_cards(self):
-        print(len(self.deck))
+        print(len(self.game.play_deck))
+
+
+class GameState():
+    """Store deck, discard, players, and turn"""
+    def __init__(self, ):
+        self.play_deck = []
+        self.create_deck()
+        self.discard_deck = []
+        self.players = []
+        self.turn = None
+
+    def create_deck(self):
+        """Fill shuffled deck with playable decks in specified amounts from db"""
+        path = os.path.join(tools.Image.path, "cards")
+        for root, dirs, files in os.walk(path):
+            for f in files:
+                if f.endswith(".png"):
+                    path = os.path.abspath(os.path.join(root, f))
+                    image = pg.image.load(path)
+                    filename = tools.get_filename(path)
+                    if tools.get_category(path) not in ["roles", "characters", "other"]:
+                        for i in range(data.data[filename]["max"]):
+                            self.play_deck.append(card.Card(path))
+        random.shuffle(self.play_deck)
 
 if __name__ == "__main__":
     gameserver = GameServer(localaddr=('0.0.0.0', 1337))
     while True:
         gameserver.Pump()
         gameserver.print_status(3)
-        time.sleep(0.0001)
+        time.sleep(0.001)
         

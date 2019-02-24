@@ -21,14 +21,14 @@ class Game(states.States, ConnectionListener):
         self.screen_rect = screen_rect
         self.cards_database = data.data
         self.roles_database = data.roles
-        self.deck = []  # only playable cards
+        self.play_deck = []  # only playable cards
         self.create_deck()
         self.table = []
-        self.discard = []
+        self.discard_deck = []
         self.connected = False
         self.player = player.Player("Tarn")
         self.button_functions = [self.card_to_discard, self.player_equip_gun, self.player_equip_buff]
-        self.visualizer = GameVisualizer(self.screen_rect, self.player, self.deck, self.discard, self.button_functions)
+        self.visualizer = GameVisualizer(self.screen_rect, self.player, self.play_deck, self.discard_deck, self.button_functions)
 
         self.Connect(('localhost', 1337))
         connection.Send({"player": self.player.id})
@@ -55,9 +55,10 @@ class Game(states.States, ConnectionListener):
         elif card in self.player.buffs:
             self.player.buffs.remove(card)
         elif card is self.player.gun:
-            self.discard.append(card)
-        self.discard.append(card)
+            self.discard_deck.append(card)
+        self.discard_deck.append(card)
         self.button_sound.sound.play()
+        self.send_cards(self.play_deck)
 
     def check_select_deselect_card(self):
         """Check if card was hovered by mouse.
@@ -88,18 +89,18 @@ class Game(states.States, ConnectionListener):
 
     def draw_cards(self, N):
         """Return last N removed cards from deck"""
-        drawn = self.deck[-N:]
-        self.deck = self.deck[:-N]
+        drawn = self.play_deck[-N:]
+        self.play_deck = self.play_deck[:-N]
         return drawn
 
     def discard_to_deck_reshuffle(self):
         """Pass reshuffled discard deck to play deck,
         leave last card in discard
         """
-        if not self.deck:
-            self.deck = self.discard[:-1]
-            random.shuffle(self.deck)
-            self.discard = self.discard[-1:]
+        if not self.play_deck:
+            self.play_deck = self.discard_deck[:-1]
+            random.shuffle(self.play_deck)
+            self.discard_deck = self.discard_deck[-1:]
 
     def create_deck(self):
         """Fill shuffled deck with playable decks in specified amounts from db"""
@@ -112,14 +113,14 @@ class Game(states.States, ConnectionListener):
                     filename = tools.get_filename(path)
                     if tools.get_category(path) not in ["roles", "characters", "other"]:
                         for i in range(self.cards_database[filename]["max"]):
-                            self.deck.append(card.Card(path, self.screen_rect))
-        random.shuffle(self.deck)
+                            self.play_deck.append(card.Card(path, self.screen_rect))
+        random.shuffle(self.play_deck)
 
     def player_equip_gun(self):
         """Player equip gun, discard previous gun"""
         card = self.player.equip_gun()
         if card:
-            self.discard.append(card)
+            self.discard_deck.append(card)
         self.button_sound.sound.play()
 
     def player_equip_buff(self):
@@ -205,8 +206,8 @@ class Game(states.States, ConnectionListener):
             self.visualizer.update_role_overlay()
 
             ###TEMPORARY###
-        if not self.player.hand and self.deck:          # TEMPORARY
-            self.player.hand = self.draw_cards(5) or self.draw_cards(len(self.deck))
+        if not self.player.hand and self.play_deck:          # TEMPORARY
+            self.player.hand = self.draw_cards(5) or self.draw_cards(len(self.play_deck))
         # if not self.enemy_player.hand and self.deck:    # TEMPORARY
             # self.enemy_player.hand = self.draw_cards(5) or self.draw_cards(len(self.deck))
 
